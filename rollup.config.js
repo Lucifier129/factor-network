@@ -2,6 +2,9 @@
 import resolve from 'rollup-plugin-node-resolve'
 import babel from 'rollup-plugin-babel'
 import license from 'rollup-plugin-license'
+import fs from 'fs'
+
+const pkg = JSON.parse(fs.readFileSync('./package.json'))
 
 const banner =
   `/*!
@@ -11,10 +14,12 @@ const banner =
  * @license
  */`
 
+const moduleName = pkg.name.split('-').map(str => str[0].toUpperCase() + str.slice(1)).join('')
+
 export default {
   entry: 'src/index.js',
   format: 'umd',
-  moduleName: 'NeuralNetwork',
+  moduleName: moduleName,
   plugins: [
     resolve(),
     babel({
@@ -26,5 +31,5 @@ export default {
       banner
     })
   ],
-  dest: './dist/neural-network.js'
+  dest: `./dist/${pkg.name}.js`
 }

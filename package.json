@@ -1,26 +1,26 @@
 {
-  "name": "neural-network",
+  "name": "factor-network",
   "version": "1.0.0",
   "description": "A simple artificial neural network implementation written by JavaScript",
-  "main": "./dist/neural-network.js",
+  "main": "./dist/factor-network.js",
   "scripts": {
     "test": "mocha --require babel-polyfill --compilers babel-register",
     "build": "rollup -c",
     "prebuild": "rimraf ./dist",
-    "postbuild": "uglifyjs ./dist/neural-network.js --compress --mangle --comments  --output ./dist/neural-network.js.min.js",
+    "postbuild": "uglifyjs ./dist/factor-network.js --compress --mangle --comments  --output ./dist/factor-network.js.min.js",
     "build:dev": "rollup -c -w"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Lucifier129/neural-network.git"
+    "url": "git+https://github.com/Lucifier129/factor-network.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Lucifier129/neural-network/issues"
+    "url": "https://github.com/Lucifier129/factor-network/issues"
   },
-  "homepage": "https://github.com/Lucifier129/neural-network#readme",
+  "homepage": "https://github.com/Lucifier129/factor-network#readme",
   "devDependencies": {
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-polyfill": "^6.23.0",

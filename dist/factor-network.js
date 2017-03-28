@@ -1,5 +1,5 @@
 /*!
- * neural-network.js v1.0.0
+ * factor-network.js v1.0.0
  * (c) 2017-03-28 Jade Gu
  * Released under the MIT License.
  * @license
@@ -7,7 +7,7 @@
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(factory((global.NeuralNetwork = global.NeuralNetwork || {})));
+	(factory((global.FactorNetwork = global.FactorNetwork || {})));
 }(this, (function (exports) { 'use strict';
 
 function SIGMOID(x) {

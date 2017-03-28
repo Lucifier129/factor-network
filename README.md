@@ -1,2 +1,2 @@
-# neural-network
-A simple artificial neural network implementation written by JavaScript
+# factor-network
+A simple factor-network implementation written by JavaScript
