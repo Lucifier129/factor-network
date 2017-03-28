@@ -1,0 +1,40 @@
+{
+  "name": "neural-network",
+  "version": "1.0.0",
+  "description": "A simple artificial neural network implementation written by JavaScript",
+  "main": "./dist/neural-network.js",
+  "scripts": {
+    "test": "mocha --require babel-polyfill --compilers babel-register",
+    "build": "rollup -c",
+    "prebuild": "rimraf ./dist",
+    "postbuild": "uglifyjs ./dist/neural-network.js --compress --mangle --comments  --output ./dist/neural-network.js.min.js",
+    "build:dev": "rollup -c -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lucifier129/neural-network.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Lucifier129/neural-network/issues"
+  },
+  "homepage": "https://github.com/Lucifier129/neural-network#readme",
+  "devDependencies": {
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-es2015-rollup": "^3.0.0",
+    "babel-preset-latest": "^6.24.0",
+    "babel-preset-stage-0": "^6.22.0",
+    "babel-register": "^6.24.0",
+    "expect": "^1.20.2",
+    "mocha": "^3.2.0",
+    "rimraf": "^2.6.1",
+    "rollup": "^0.41.6",
+    "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-license": "^0.3.0",
+    "rollup-plugin-node-resolve": "^2.0.0",
+    "uglify-js": "^2.8.16"
+  }
+}
