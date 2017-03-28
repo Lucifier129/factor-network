@@ -1,3 +1,1 @@
-import Network from './network'
-
-export { Network }
+console.log('placeholder')
