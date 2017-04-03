@@ -60,12 +60,13 @@ function walkNetwork(network, accessor) {
 
 function mixNetwork(targetNetwork, sourceNetwork, mutation) {
 	walkNetwork(targetNetwork, function(data) {
+		let path = data.path
 		if (randomBoolean()) {
-			let sourceWeight = sourceNetwork[data.path[0]][data.path[1]][data.path[2]]
-			if (Math.random() <= mutation.rate) {
-				sourceWeight += mutation.range * randomClamped()
-			}
-			targetNetwork[data.path[0]][data.path[1]][data.path[2]] = sourceWeight
+			let sourceWeight = sourceNetwork[path[0]][path[1]][path[2]]
+			targetNetwork[path[0]][path[1]][path[2]] = sourceWeight
+		}
+		if (Math.random() <= mutation.rate) {
+			targetNetwork[path[0]][path[1]][path[2]] += mutation.range * randomClamped()
 		}
 	})
 	return targetNetwork
@@ -92,7 +93,7 @@ export default function createLearner(options) {
 			networks[index],
 			inputs,
 			activation[options.activation] || SIGMOID
-		) 
+		)
 	}
 
 	let sorts = []
@@ -137,13 +138,13 @@ export default function createLearner(options) {
 			newNetworks.push(createNetwork(options.network))
 		}
 
-		let mixCount = 0
+		let max = 0
 		while (true) {
-			for (let i = 0; i < mixCount; i++) {
+			for (let i = 0; i < max; i++) {
 				for (let j = 0; j < options.mixNumber; j++) {
 					let newNetwork = mixNetwork(
 						copyNetwork(sorts[i].network),
-						sorts[mixCount].network,
+						sorts[max].network,
 						options.mutation
 					)
 					newNetworks.push(newNetwork)
@@ -154,7 +155,7 @@ export default function createLearner(options) {
 					}
 				}
 			}
-			mixCount++
+			max++
 		}
 	}
 
@@ -192,11 +193,11 @@ function SIGMOID(x) {
 
 function TANH(x) {
 	if (x === Infinity) {
-    return 1;
-  } else if (x === -Infinity) {
-    return -1;
-  } else {
-    let e2x = Math.exp(2 * x);
-    return (e2x - 1) / (e2x + 1);
-  }
+		return 1;
+	} else if (x === -Infinity) {
+		return -1;
+	} else {
+		let e2x = Math.exp(2 * x);
+		return (e2x - 1) / (e2x + 1);
+	}
 }
