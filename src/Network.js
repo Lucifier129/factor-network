@@ -1,30 +1,68 @@
-import Layer from './Layer'
-import { indentity, prop } from './util'
+import {
+	randomClamped,
+	activation
+} from './util'
 
-export default class Network {
-	constructor(shape = []) {
-		this.shape = shape
-		this.layers = []
+export function create(options) {
+	let network = []
+	let previousInputs = options[0]
+	for (let i = 1; i < options.length; i++) {
+		let currentLayer = []
+		for (let j = 0; j < options[i]; j++) {
+			let currentNode = []
+			for (let k = 0; k < previousInputs; k++) {
+				let randomWeight = randomClamped()
+				currentNode.push(randomWeight)
+			}
+			currentLayer.push(currentNode)
+		}
+		previousInputs = currentLayer.length
+		network.push(currentLayer)
 	}
-	generateLayers(data = []) {
-		let { shape, layers } = this
-		let inputNumber = 0
-		for (let i = 0; i < shape.length; i++) {
-			let layer = new Layer(i, shape[i])
-			layer.generateCalculators(inputNumber, data[i])
-			layers.push(layer)
-			inputNumber = shape[i]
+	return network
+}
+
+export function compute(network, inputs, activationType) {
+	let currentInputs = inputs
+	let networkResult = [inputs.concat()]
+	for (let i = 0; i < network.length; i++) {
+		let currentLayer = network[i]
+		let currentLayerResult = []
+		for (let j = 0; j < currentLayer.length; j++) {
+			let currentNode = currentLayer[j]
+			let sum = 0
+			for (let k = 0; k < currentNode.length; k++) {
+				let currentWeight = currentNode[k]
+				sum += currentInputs[k] * currentWeight
+			}
+			let currentNodeResult = activation[activationType].output(sum)
+			currentLayerResult.push(currentNodeResult)
+		}
+		networkResult.push(currentLayerResult)
+		currentInputs = currentLayerResult
+	}
+	return networkResult
+}
+
+export function walk(network, accessor) {
+	for (let i = 0; i < network.length; i++) {
+		let currentLayer = network[i]
+		for (let j = 0; j < currentLayer.length; j++) {
+			let currentNode = currentLayer[j]
+			for (let k = 0; k < currentNode.length; k++) {
+				let currentWeight = currentNode[k]
+				accessor({
+					weight: currentWeight,
+					node: currentNode,
+					layer: currentLayer,
+					network: network,
+					path: [i, j, k]
+				})
+			}
 		}
 	}
-	compute(inputs) {
-		let { shape, layers } = this
-		let currentInputs = inputs
-		let getValue = prop('value')
-		for (let i = 0; i < layers.length; i++) {
-			let layer = layers[i]
-			layer.compute(currentInputs, i === 0 ? indentity : getValue)
-			currentInputs = layer.calculators
-		}
-		return layers[layers.length - 1].output()
-	}
+}
+
+export function copy(network) {
+	return JSON.parse(JSON.stringify(network))
 }
