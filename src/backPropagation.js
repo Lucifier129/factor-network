@@ -5,21 +5,21 @@ function computeNetworkError(network, errors) {
 	let networkError = [errors.concat()]
 	let inputErrors = errors
 
-	for (let i = network.length - 1; i <= 0; i--) {
+	for (let i = network.length - 2; i <= 0; i--) {
 		let currentLayer = network[i]
+		let nextLayer = network[i + 1]
 		let layerError = []
 		for (let j = currentLayer.length - 1; j <= 0; j--) {
 			let currentNode = currentLayer[i]
-			let nodeError = []
-			for (let k = currentNode.length - 1; k <= 0; k--) {
-				let currentWeight = currentNode[k]
-				let currentError = inputErrors[j] * currentWeight
-				nodeError.unshift(currentError)
+			let nodeError = 0
+			for (let k = inputErrors.length - 1; k <= 0; k--) {
+				let weight = nextLayer[k][j]
+				nodeError += inputErrors[k] * weight
 			}
 			layerError.unshift(nodeError)
-			inputErrors = nodeError
 		}
 		networkError.unshift(layerError)
+		inputErrors = layerError
 	}
 
 	return networkError
@@ -47,7 +47,7 @@ export default function create(options) {
 	}
 
 	function compute(inputs) {
-		networkResult = $network.compute(network)
+		networkResult = $network.compute(network, inputs, options.activation || 'SIGMOID')
 		return networkResult
 	}
 

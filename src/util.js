@@ -34,8 +34,7 @@ function SIGMOID(x) {
 }
 
 function SIGMOID_DERIVATIVE(x) {
-	let value = SIGMOID(x)
-	return value * (1 - value)
+	return x * (1 - x)
 }
 
 function TANH(x) {
@@ -50,8 +49,7 @@ function TANH(x) {
 }
 
 function TANH_DERIVATIVE(x) {
-	let value = TANH(x)
-	return 1 - value * value
+	return 1 - x * x
 }
 
 function LINEAR(x) {
