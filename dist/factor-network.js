@@ -1,6 +1,6 @@
 /*!
  * factor-network.js v1.0.0
- * (c) 2017-04-04 Jade Gu
+ * (c) 2017-04-05 Jade Gu
  * Released under the MIT License.
  * @license
  */
@@ -46,8 +46,7 @@ function SIGMOID(x) {
 }
 
 function SIGMOID_DERIVATIVE(x) {
-	var value = SIGMOID(x);
-	return value * (1 - value);
+	return x * (1 - x);
 }
 
 function TANH(x) {
@@ -62,11 +61,10 @@ function TANH(x) {
 }
 
 function TANH_DERIVATIVE(x) {
-	var value = TANH(x);
-	return 1 - value * value;
+	return 1 - x * x;
 }
 
-function create$1(options) {
+function create(options) {
 	var network = [];
 	var previousInputs = options[0];
 	for (var i = 1; i < options.length; i++) {
@@ -98,7 +96,7 @@ function compute(network, inputs, activationType) {
 				var currentWeight = currentNode[k];
 				sum += currentInputs[k] * currentWeight;
 			}
-			var currentNodeResult = activation[activationType].output(sum);
+			var currentNodeResult = activation[activationType || 'SIGMOID'].output(sum);
 			currentLayerResult.push(currentNodeResult);
 		}
 		networkResult.push(currentLayerResult);
@@ -130,25 +128,31 @@ function copy(network) {
 	return JSON.parse(JSON.stringify(network));
 }
 
+var network = Object.freeze({
+	create: create,
+	compute: compute,
+	walk: walk,
+	copy: copy
+});
+
 function computeNetworkError(network, errors) {
 	var networkError = [errors.concat()];
 	var inputErrors = errors;
 
-	for (var i = network.length - 1; i <= 0; i--) {
+	for (var i = network.length - 2; i >= 0; i--) {
 		var currentLayer = network[i];
+		var nextLayer = network[i + 1];
 		var layerError = [];
-		for (var j = currentLayer.length - 1; j <= 0; j--) {
-			var currentNode = currentLayer[i];
-			var nodeError = [];
-			for (var k = currentNode.length - 1; k <= 0; k--) {
-				var currentWeight = currentNode[k];
-				var currentError = inputErrors[j] * currentWeight;
-				nodeError.unshift(currentError);
+		for (var j = currentLayer.length - 1; j >= 0; j--) {
+			var nodeError = 0;
+			for (var k = nextLayer.length - 1; k >= 0; k--) {
+				var weight = nextLayer[k][j];
+				nodeError += inputErrors[k] * weight;
 			}
 			layerError.unshift(nodeError);
-			inputErrors = nodeError;
 		}
 		networkError.unshift(layerError);
+		inputErrors = layerError;
 	}
 
 	return networkError;
@@ -158,44 +162,48 @@ function updateNetworkWeights(network, networkResult, networkError, activationTy
 	walk(network, function (data) {
 		var path = data.path;
 		var currentWeight = network[path[0]][path[1]][path[2]];
-		var currentInput = networkResult[path[0]][path[1]];
+		var currentInput = networkResult[path[0]][path[2]];
 		var currentResult = networkResult[path[0] + 1][path[1]];
 		var currentError = networkError[path[0]][path[1]];
-		var newWeight = currentWeight + learningRate * currentError * currentInput * activation[activationType].derivative(currentResult);
+		var deltaWeight = -learningRate * currentError * currentInput * activation[activationType].derivative(currentResult);
+		var newWeight = currentWeight + deltaWeight;
 		network[path[0]][path[1]][path[2]] = newWeight;
 	});
 }
 
-function create$$1(options) {
-	var network = create$1(options.network);
+function create$1(options) {
+	var network = create(options.network);
 	var networkResult = null;
-	var networkError = null;
 
 	function getNetwork() {
 		return network;
 	}
 
 	function compute$$1(inputs) {
-		networkResult = compute(network);
+		networkResult = compute(network, inputs, options.activation || 'SIGMOID');
 		return networkResult;
 	}
 
-	function adjuest(labels) {
+	function computeError(labels) {
 		var errors = [];
 		var lastResult = networkResult[networkResult.length - 1];
 		for (var i = 0; i < labels.length; i++) {
-			var error = labels[i] - lastResult[i];
+			var error = lastResult[i] - labels[i];
 			errors.push(error);
 		}
-		networkError = computeNetworkError(network, errors);
-		updateNetworkWeights(network, networkResult, networkError, options.activation, options.learningRate);
+		return computeNetworkError(network, errors);
+	}
+
+	function adjust(labels) {
+		var networkError = computeError(labels);
+		updateNetworkWeights(network, networkResult, networkError, options.activation || 'SIGMOID', options.learningRate);
 	}
 
 	return {
 		options: options,
 		getNetwork: getNetwork,
 		compute: compute$$1,
-		adjuest: adjuest
+		adjust: adjust
 	};
 }
 
@@ -217,7 +225,7 @@ function create$2(options) {
 	var networks = [];
 
 	for (var i = 0; i < options.amount; i++) {
-		var network = create$1(options.network);
+		var network = create(options.network);
 		networks.push(network);
 	}
 
@@ -268,7 +276,7 @@ function create$2(options) {
 
 		var randomAmount = Math.round(options.randomRate * options.amount);
 		for (var _i2 = 0; _i2 < randomAmount; _i2++) {
-			newNetworks.push(create$1(options.network));
+			newNetworks.push(create(options.network));
 		}
 
 		var max = 0;
@@ -299,7 +307,8 @@ function create$2(options) {
 }
 
 var index = {
-	backPropagation: create$$1,
+	network: network,
+	backPropagation: create$1,
 	evolution: create$2
 };
 
