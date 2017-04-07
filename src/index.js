@@ -1,10 +1,9 @@
 import * as network from './network'
-import backPropagation from './backPropagation'
-import evolution from './evolution'
-
+import createBackPropagation from './createBackPropagation'
+import createEvolution from './createEvolution'
 
 export default {
 	network: network,
-	backPropagation: backPropagation,
-	evolution: evolution,
+	createBackPropagation: createBackPropagation,
+	createEvolution: createEvolution,
 }

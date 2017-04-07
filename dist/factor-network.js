@@ -1,6 +1,6 @@
 /*!
  * factor-network.js v1.0.0
- * (c) 2017-04-05 Jade Gu
+ * (c) 2017-04-06 Jade Gu
  * Released under the MIT License.
  * @license
  */
@@ -135,6 +135,49 @@ var network = Object.freeze({
 	copy: copy
 });
 
+var defaults = {
+	network: [2, 2, 1],
+	activation: 'SIGMOID',
+	learningRate: 0.1
+};
+
+function createBackPropagation(settings) {
+	var options = Object.assign({}, defaults, settings);
+	var network = create(options.network);
+	var networkResult = null;
+
+	function getNetwork() {
+		return network;
+	}
+
+	function compute$$1(inputs) {
+		networkResult = compute(network, inputs, options.activation);
+		return networkResult;
+	}
+
+	function computeError(labels) {
+		var errors = [];
+		var lastResult = networkResult[networkResult.length - 1];
+		for (var i = 0; i < labels.length; i++) {
+			var error = lastResult[i] - labels[i];
+			errors.push(error);
+		}
+		return computeNetworkError(network, errors);
+	}
+
+	function adjust(labels) {
+		var networkError = computeError(labels);
+		updateNetworkWeights(network, networkResult, networkError, options.activation, options.learningRate);
+	}
+
+	return {
+		options: options,
+		getNetwork: getNetwork,
+		compute: compute$$1,
+		adjust: adjust
+	};
+}
+
 function computeNetworkError(network, errors) {
 	var networkError = [errors.concat()];
 	var inputErrors = errors;
@@ -171,37 +214,100 @@ function updateNetworkWeights(network, networkResult, networkError, activationTy
 	});
 }
 
-function create$1(options) {
-	var network = create(options.network);
-	var networkResult = null;
+var defaults$1 = {
+	network: [2, 2, 1],
+	amount: 50,
+	elitismRate: 0.2,
+	randomRate: 0.2,
+	mixNumber: 1,
+	mutation: {
+		rate: 0.1,
+		range: 0.5
+	},
+	activation: 'SIGMOID'
+};
 
-	function getNetwork() {
-		return network;
-	}
+function createEvolution(settings) {
+	var options = Object.assign({}, defaults$1, settings);
+	var networks = [];
 
-	function compute$$1(inputs) {
-		networkResult = compute(network, inputs, options.activation || 'SIGMOID');
-		return networkResult;
-	}
-
-	function computeError(labels) {
-		var errors = [];
-		var lastResult = networkResult[networkResult.length - 1];
-		for (var i = 0; i < labels.length; i++) {
-			var error = lastResult[i] - labels[i];
-			errors.push(error);
+	function createNetworks(amount) {
+		for (var i = 0; i < amount; i++) {
+			var network = create(options.network);
+			networks.push(network);
 		}
-		return computeNetworkError(network, errors);
+		options.amount = networks.length;
 	}
 
-	function adjust(labels) {
-		var networkError = computeError(labels);
-		updateNetworkWeights(network, networkResult, networkError, options.activation || 'SIGMOID', options.learningRate);
+	function updateAmount(targetAmount) {
+		var currentAmount = networks.length;
+		if (currentAmount > targetAmount) {
+			networks.length = targetAmount;
+			options.amount = targetAmount;
+		} else if (currentAmount < targetAmount) {
+			createNetworks(targetAmount - currentAmount);
+		}
 	}
+
+	function getNetworks() {
+		return networks;
+	}
+
+	function sortNetworks(ranks) {
+		var newNetworks = [];
+		for (var i = 0; i < ranks.length; i++) {
+			newNetworks.push(networks[ranks[i]]);
+		}
+		networks = newNetworks;
+		options.amount = networks.length;
+	}
+
+	function compute$$1(index, inputs) {
+		return compute(networks[index], inputs, options.activation);
+	}
+
+	function adjust(ranks) {
+		if (ranks) {
+			sortNetworks(ranks);
+		}
+
+		var newNetworks = [];
+
+		var elitismAmount = Math.round(options.elitismRate * options.amount);
+		for (var i = 0; i < elitismAmount; i++) {
+			newNetworks.push(networks[i]);
+		}
+
+		var randomAmount = Math.round(options.randomRate * options.amount);
+		for (var _i = 0; _i < randomAmount; _i++) {
+			newNetworks.push(create(options.network));
+		}
+
+		var max = 0;
+		while (true) {
+			for (var _i2 = 0; _i2 < max; _i2++) {
+				for (var j = 0; j < options.mixNumber; j++) {
+					var newNetwork = mixNetwork(copy(networks[_i2]), networks[max], options.mutation);
+					newNetworks.push(newNetwork);
+					if (newNetworks.length >= options.amount) {
+						newNetworks.length = options.amount;
+						networks = newNetworks;
+						return;
+					}
+				}
+			}
+			max++;
+		}
+	}
+
+	createNetworks(options.amount);
 
 	return {
 		options: options,
-		getNetwork: getNetwork,
+		createNetworks: createNetworks,
+		getNetworks: getNetworks,
+		sortNetworks: sortNetworks,
+		updateAmount: updateAmount,
 		compute: compute$$1,
 		adjust: adjust
 	};
@@ -221,95 +327,10 @@ function mixNetwork(targetNetwork, sourceNetwork, mutation) {
 	return targetNetwork;
 }
 
-function create$2(options) {
-	var networks = [];
-
-	for (var i = 0; i < options.amount; i++) {
-		var network = create(options.network);
-		networks.push(network);
-	}
-
-	function getNetworks() {
-		return networks;
-	}
-
-	function compute$$1(index, inputs) {
-		return compute(networks[index], inputs, options.activation || 'SIGMOID');
-	}
-
-	var sorts = [];
-
-	function addItem(index, score) {
-		sorts.push({
-			score: score,
-			network: networks[index]
-		});
-	}
-
-	function clearAll() {
-		sorts = [];
-	}
-
-	function sortItems(sortType) {
-		sorts.sort(function (a, b) {
-			if (sortType > 0) {
-				return a.score - b.score;
-			} else {
-				return b.score - a.score;
-			}
-		});
-	}
-
-	function adjust() {
-		if (sorts.length !== options.amount) {
-			return;
-		}
-
-		sortItems(options.sortType);
-
-		var newNetworks = [];
-
-		var elitismAmount = Math.round(options.elitismRate * options.amount);
-		for (var _i = 0; _i < elitismAmount; _i++) {
-			newNetworks.push(sorts[_i].network);
-		}
-
-		var randomAmount = Math.round(options.randomRate * options.amount);
-		for (var _i2 = 0; _i2 < randomAmount; _i2++) {
-			newNetworks.push(create(options.network));
-		}
-
-		var max = 0;
-		while (true) {
-			for (var _i3 = 0; _i3 < max; _i3++) {
-				for (var j = 0; j < options.mixNumber; j++) {
-					var newNetwork = mixNetwork(copy(sorts[_i3].network), sorts[max].network, options.mutation);
-					newNetworks.push(newNetwork);
-					if (newNetworks.length === options.amount) {
-						sorts = [];
-						networks = newNetworks;
-						return;
-					}
-				}
-			}
-			max++;
-		}
-	}
-
-	return {
-		getNetworks: getNetworks,
-		options: options,
-		compute: compute$$1,
-		addItem: addItem,
-		clearAll: clearAll,
-		adjust: adjust
-	};
-}
-
 var index = {
 	network: network,
-	backPropagation: create$1,
-	evolution: create$2
+	createBackPropagation: createBackPropagation,
+	createEvolution: createEvolution
 };
 
 return index;
