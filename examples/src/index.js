@@ -5,15 +5,15 @@ import BackPropagation from './flappy-learning/BackPropagation'
 import Master from './flappy-learning/Master'
 
 const routes = {
-	'evolution': {
+	'Neuroevolution': {
 		title: '神经进化算法',
 		Component: Evolution,
 	},
-	'backpropagation': {
+	'Back-Propagation': {
 		title: '反向传播算法',
 		Component: BackPropagation
 	},
-	'10-masters': {
+	'Ten-Masters': {
 		title: '十大高手对决',
 		Component: Master,
 	}
@@ -22,22 +22,23 @@ const routes = {
 function Menu() {
 	return (
 		<ul>
-		<h1>Flappy-Learning</h1>
-		{
-			Object.keys(routes).map(route => {
-				return (
-					<li key={route}>
-						<a href={`#${route}`}>{route + ': ' + routes[route].title}</a>
-					</li>
-				)
-			})
-		}
+			<h1>Flappy-Learning</h1>
+			<h2>Powered by <a href="https://github.com/Lucifier129/factor-network">Factor-Network</a></h2>
+			{
+				Object.keys(routes).map(route => {
+					return (
+						<li key={route}>
+							<a href={`#${route}`}>{route + ': ' + routes[route].title}</a>
+						</li>
+					)
+				})
+			}
 		</ul>
 	)
 }
 
 function App() {
-	let targetRouter = routes[location.hash.substr(1)]
+	let targetRouter = routes[location.hash.substr(1)] || routes['Neuroevolution']
 	return (
 		<div>
 			<Menu />

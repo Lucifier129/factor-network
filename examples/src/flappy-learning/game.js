@@ -1,5 +1,5 @@
 var timeouts = [];
-var messageName = "zero-timeout-message";
+var messageName = "zero-timeout-message"
 
 function setZeroTimeout(fn) {
 	timeouts.push(fn);
@@ -303,6 +303,7 @@ export default function createGame() {
 	Game.prototype.destroy = function() {
 		cancelAnimationFrame(this.requestId)
 		this.isOver = true
+		this.update = function() {}
 		this.emit('onStop')
 	}
 

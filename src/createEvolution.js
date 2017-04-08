@@ -95,6 +95,9 @@ export default function createEvolution(settings) {
 				}
 			}
 			max++
+			if (max === networks.length) {
+				max = 0
+			}
 		}
 	}
 

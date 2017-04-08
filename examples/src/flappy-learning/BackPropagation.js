@@ -17,7 +17,8 @@ export default class BackPropagation extends React.Component {
 		})
 	}
 	componentDidMount() {
-		this.labelNetwork = masters[Math.round(Math.random() * (masters.length - 1))]
+		this.labelNetwork = masters[0]
+		// this.labelNetwork = masters[Math.round(Math.random() * (masters.length - 1))]
 		this.learner = createBackPropagation({
 			network: [2, 2, 1],
 			activation: 'SIGMOID',

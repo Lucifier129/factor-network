@@ -1,6 +1,6 @@
 /*!
  * factor-network.js v1.0.0
- * (c) 2017-04-06 Jade Gu
+ * (c) 2017-04-08 Jade Gu
  * Released under the MIT License.
  * @license
  */
@@ -297,6 +297,9 @@ function createEvolution(settings) {
 				}
 			}
 			max++;
+			if (max === networks.length) {
+				max = 0;
+			}
 		}
 	}
 

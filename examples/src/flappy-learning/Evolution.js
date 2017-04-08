@@ -65,10 +65,16 @@ export default class Evolution extends React.Component {
 		if (newAmount === evolution.options.amount) {
 			return
 		}
+
+		if (newAmount < 2) {
+			alert(`How to breed with just ${newAmount} bird`)
+			return
+		}
+
+		this.game.stop()
 		evolution.updateAmount(0)
 		evolution.updateAmount(newAmount)
 		this.ranks = []
-		this.game.stop()
 		this.startGame()
 	}
 	render() {
