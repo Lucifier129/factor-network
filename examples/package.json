@@ -2,7 +2,7 @@
   "name": "examples",
   "version": "0.1.0",
   "private": true,
-  "hompage": "/factor-network",
+  "homepage": "/factor-network/examples/build",
   "dependencies": {
     "react": "^15.4.2",
     "react-dom": "^15.4.2"
