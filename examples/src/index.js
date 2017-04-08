@@ -23,7 +23,7 @@ function Menu() {
 	return (
 		<ul>
 			<h1>Flappy-Learning</h1>
-			<h2>Powered by <a href="https://github.com/Lucifier129/factor-network">Factor-Network</a></h2>
+			<h2>Powered by <a href="https://github.com/Lucifier129/factor-network">GitHub: Factor-Network</a></h2>
 			{
 				Object.keys(routes).map(route => {
 					return (
