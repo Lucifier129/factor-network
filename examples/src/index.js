@@ -1,20 +1,21 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Evolution from './flappy-learning/Evolution'
+import EvolutionWithLabel from './flappy-learning/Evolution-with-label'
 import BackPropagation from './flappy-learning/BackPropagation'
 import Master from './flappy-learning/Master'
 
 const routes = {
-	'Neuroevolution': {
-		title: '神经进化算法',
+	'Neuroevolution-Without-Labeled-Data': {
 		Component: Evolution,
 	},
+	'Neuroevolution-With-Labeled-Data': {
+		Component: EvolutionWithLabel,
+	},
 	'Back-Propagation': {
-		title: '反向传播算法',
 		Component: BackPropagation
 	},
 	'Ten-Masters': {
-		title: '十大高手对决',
 		Component: Master,
 	}
 }
@@ -28,7 +29,7 @@ function Menu() {
 				Object.keys(routes).map(route => {
 					return (
 						<li key={route}>
-							<a href={`#${route}`}>{route + ': ' + routes[route].title}</a>
+							<a href={`#${route}`}>{route}</a>
 						</li>
 					)
 				})

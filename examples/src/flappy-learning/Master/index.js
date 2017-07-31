@@ -43,6 +43,13 @@ export default class BackPropagation extends React.Component {
 				<button onClick={this.handleSwitchSpeed} data-speed="180">x3</button>
 				<button onClick={this.handleSwitchSpeed} data-speed="380">x5</button>
 				<button onClick={this.handleSwitchSpeed} data-speed="0">MAX</button>
+				<div>
+					<h3>Description</h3>
+					<ul>
+						<li>Pick ten master birds trained by <a href="#Neuroevolution">Neuroevolution</a></li>
+						<li>Start game</li>
+					</ul>
+				</div>
 			</div>
 		)
 	}

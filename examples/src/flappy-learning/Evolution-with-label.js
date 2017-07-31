@@ -1,11 +1,14 @@
 import React from 'react'
 import FactorNetwork from '../../../dist/factor-network'
 import createGame from './game'
+import networks from './Master/networks'
 
 const {
 	network: $network,
 	createEvolution
 } = FactorNetwork
+
+const labelNetwork = networks[0]
 
 const evolution = createEvolution({
 	network: [2, 2, 1],
@@ -16,20 +19,42 @@ const evolution = createEvolution({
 export default class Evolution extends React.Component {
 	constructor(props, context) {
 		super(props, context)
-		this.ranks = []
+		this.errorList = []
 		this.state = {
 			amount: evolution.options.amount
 		}
 	}
 	startGame() {
+		this.errorList = []
 		this.game = createGame()
 		this.game.start({
 			birds: evolution.options.amount,
 			onStart: this.handleStart,
 			onUpdate: this.handleUpdate,
-			// onStop: this.handleStop,
-			onBirdDead: this.handleBirdDead,
 		})
+	}
+	addError(index, error) {
+		if (!Array.isArray(this.errorList[index])) {
+			this.errorList[index] = []
+		}
+		this.errorList[index].push(error)
+	}
+	clearErrorList() {
+		this.errorList = []
+	}
+	getRanks() {
+		let { errorList } = this
+		let list = []
+
+		for (let i = 0; i < errorList.length; i++) {
+			let sum = errorList[i].reduce((sum, item) => sum + Math.abs(item), 0)
+			let value = sum / errorList[i].length
+			list.push({ index: i , value })
+		}
+
+		let ranks = list.sort((a, b) => a.value - b.value)
+		console.log('Min error', ranks[0].value)
+		return ranks.map(({ index }) => index)
 	}
 	componentDidMount() {
 		this.startGame()
@@ -38,17 +63,18 @@ export default class Evolution extends React.Component {
 		this.game.stop()
 	}
 	handleStart = () => {
-		if (this.ranks.length > 0) {
-			evolution.adjust(this.ranks)
-			this.ranks = []
+		if (this.errorList.length > 0) {
+			evolution.adjust(this.getRanks())
+			this.clearErrorList()
 		}
 	}
-	handleBirdDead = ({ index, bird, score }) => {
-		this.ranks.unshift(index)
-	}
 	handleUpdate = ({ index, bird, inputs }) => {
+		let labelResults = $network.compute(labelNetwork, inputs, 'RELU')
+		let labelResult = labelResults[labelResults.length - 1][0]
 		let results = evolution.compute(index, inputs)
 		let result = results[results.length - 1][0]
+		let error = labelResult - result
+		this.addError(index, error)
 		if (result > 0.5) {
 			bird.flap()
 		}
@@ -74,7 +100,6 @@ export default class Evolution extends React.Component {
 		this.game.stop()
 		evolution.updateAmount(0)
 		evolution.updateAmount(newAmount)
-		this.ranks = []
 		this.startGame()
 	}
 	render() {
@@ -96,10 +121,13 @@ export default class Evolution extends React.Component {
 				<div>
 					<h3>Description</h3>
 					<ul>
+						<li>Pick a master bird trained by <a href="#Neuroevolution">Neuroevolution</a></li>
 						<li>Generate {this.state.amount} birds</li>
-						<li>Order birds by their score(Higher is better)</li>
-						<li>Make the birds with higher score breed more</li>
-						<li>Make the birds with lower score breed less or eliminate</li>
+						<li>Use the master bird to generate labeled data</li>
+						<li>Use labeled data to compute the error of all birds</li>
+						<li>Order birds by their error(Lower is better)</li>
+						<li>Make the birds with lower error breed more</li>
+						<li>Make the birds with higher error breed less or eliminate</li>
 						<li>Repeat the steps above</li>
 					</ul>
 				</div>

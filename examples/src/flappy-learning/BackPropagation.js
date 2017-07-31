@@ -56,6 +56,16 @@ export default class BackPropagation extends React.Component {
 				<button onClick={this.handleSwitchSpeed} data-speed="180">x3</button>
 				<button onClick={this.handleSwitchSpeed} data-speed="380">x5</button>
 				<button onClick={this.handleSwitchSpeed} data-speed="0">MAX</button>
+				<div>
+					<h3>Description</h3>
+					<ul>
+						<li>Pick a master bird trained by <a href="#Neuroevolution">Neuroevolution</a></li>
+						<li>Generate one bird</li>
+						<li>Use the master bird to generate labeled data</li>
+						<li>Use BackPropagation to train the bird by fixing its error</li>
+						<li>Repeat the steps above</li>
+					</ul>
+				</div>
 			</div>
 		)
 	}
