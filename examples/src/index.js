@@ -39,7 +39,7 @@ function Menu() {
 }
 
 function App() {
-	let targetRouter = routes[location.hash.substr(1)] || routes['Neuroevolution']
+	let targetRouter = routes[location.hash.substr(1)] || routes['Neuroevolution-Without-Labeled-Data']
 	return (
 		<div>
 			<Menu />
