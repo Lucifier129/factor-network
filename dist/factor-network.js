@@ -1,6 +1,6 @@
 /*!
  * factor-network.js v1.0.0
- * (c) 2017-04-08 Jade Gu
+ * (c) 2017-08-01 Jade Gu
  * Released under the MIT License.
  * @license
  */
@@ -150,6 +150,10 @@ function createBackPropagation(settings) {
 		return network;
 	}
 
+	function replaceNetwork(newNetwork) {
+		network = newNetwork;
+	}
+
 	function compute$$1(inputs) {
 		networkResult = compute(network, inputs, options.activation);
 		return networkResult;
@@ -170,11 +174,18 @@ function createBackPropagation(settings) {
 		updateNetworkWeights(network, networkResult, networkError, options.activation, options.learningRate);
 	}
 
+	function train(inputs, labels) {
+		compute$$1(inputs);
+		adjust(labels);
+	}
+
 	return {
 		options: options,
 		getNetwork: getNetwork,
+		replaceNetwork: replaceNetwork,
 		compute: compute$$1,
-		adjust: adjust
+		adjust: adjust,
+		train: train
 	};
 }
 
@@ -253,6 +264,10 @@ function createEvolution(settings) {
 		return networks;
 	}
 
+	function replaceNetworks(newNetworks) {
+		networks = newNetworks;
+	}
+
 	function sortNetworks(ranks) {
 		var newNetworks = [];
 		for (var i = 0; i < ranks.length; i++) {
@@ -309,6 +324,7 @@ function createEvolution(settings) {
 		options: options,
 		createNetworks: createNetworks,
 		getNetworks: getNetworks,
+		replaceNetworks: replaceNetworks,
 		sortNetworks: sortNetworks,
 		updateAmount: updateAmount,
 		compute: compute$$1,

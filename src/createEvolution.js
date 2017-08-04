@@ -43,6 +43,10 @@ export default function createEvolution(settings) {
 		return networks
 	}
 
+	function replaceNetworks(newNetworks) {
+		networks = newNetworks
+	}
+
 	function sortNetworks(ranks) {
 		let newNetworks = []
 		for (let i = 0; i < ranks.length; i++) {
@@ -107,10 +111,11 @@ export default function createEvolution(settings) {
 		options: options,
 		createNetworks: createNetworks,
 		getNetworks: getNetworks,
+		replaceNetworks: replaceNetworks,
 		sortNetworks: sortNetworks,
 		updateAmount: updateAmount,
 		compute: compute,
-		adjust: adjust
+		adjust: adjust,
 	}
 }
 

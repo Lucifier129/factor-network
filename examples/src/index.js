@@ -4,26 +4,22 @@ import Evolution from './flappy-learning/Evolution'
 import EvolutionWithLabel from './flappy-learning/Evolution-with-label'
 import BackPropagation from './flappy-learning/BackPropagation'
 import Master from './flappy-learning/Master'
+import HandwrittenDigit from './mnist/HandwrittenDigit'
+import BoardView2048 from './2048' 
 
 const routes = {
-	'Neuroevolution-Without-Labeled-Data': {
-		Component: Evolution,
-	},
-	'Neuroevolution-With-Labeled-Data': {
-		Component: EvolutionWithLabel,
-	},
-	'Back-Propagation': {
-		Component: BackPropagation
-	},
-	'Ten-Masters': {
-		Component: Master,
-	}
+	'Flappy-Bird: Neuroevolution-Without-Labeled-Data': Evolution,
+	'Flappy-Bird: Neuroevolution-With-Labeled-Data': EvolutionWithLabel,
+	'Flappy-Bird: Back-Propagation': BackPropagation,
+	'Flappy-Bird: Ten-Masters': Master,
+	'Mnist: Handwritten-Digit': HandwrittenDigit,
+	'Game-2048: Neuroevolution': BoardView2048
 }
 
 function Menu() {
 	return (
 		<ul>
-			<h1>Flappy-Learning</h1>
+			<h1>Factor-Network</h1>
 			<h2>Powered by <a href="https://github.com/Lucifier129/factor-network">GitHub: Factor-Network</a></h2>
 			{
 				Object.keys(routes).map(route => {
@@ -39,12 +35,12 @@ function Menu() {
 }
 
 function App() {
-	let targetRouter = routes[location.hash.substr(1)] || routes['Neuroevolution-Without-Labeled-Data']
+	let Component = routes[location.hash.substr(1)] || routes[Object.keys(routes)[0]]
 	return (
 		<div>
 			<Menu />
-			{ !!targetRouter &&
-				<targetRouter.Component />
+			{ !!Component &&
+				<Component />
 			}
 		</div>
 	)

@@ -16,6 +16,10 @@ export default function createBackPropagation(settings) {
 		return network
 	}
 
+	function replaceNetwork(newNetwork) {
+		network = newNetwork
+	}
+
 	function compute(inputs) {
 		networkResult = $network.compute(
 			network,
@@ -46,11 +50,18 @@ export default function createBackPropagation(settings) {
 		)
 	}
 
+	function train(inputs, labels) {
+		compute(inputs)
+		adjust(labels)
+	}
+
 	return {
 		options: options,
 		getNetwork: getNetwork,
+		replaceNetwork: replaceNetwork,
 		compute: compute,
 		adjust: adjust,
+		train: train,
 	}
 }
 
