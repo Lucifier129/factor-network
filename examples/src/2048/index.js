@@ -4,7 +4,7 @@ import { network as $network, createEvolution } from '../../../'
 import networkList from '../../nodejs/network/2048-ne.json'
 
 const evolution = createEvolution({
-  network: [16, 15, 4],
+  network: [16, 12, 4],
   amount: 50,
   activation: 'SIGMOID'
 })

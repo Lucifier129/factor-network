@@ -35,13 +35,21 @@ export function compute(network, inputs, activationType) {
 				let currentWeight = currentNode[k]
 				sum += currentInputs[k] * currentWeight
 			}
-			let currentNodeResult = activation[activationType || 'SIGMOID'].output(sum)
+			let currentNodeResult = getActivation(activationType, i).output(sum)
 			currentLayerResult.push(currentNodeResult)
 		}
 		networkResult.push(currentLayerResult)
 		currentInputs = currentLayerResult
 	}
 	return networkResult
+}
+
+export function getActivation(type, layerIndex) {
+	if (typeof type === 'string') {
+		return activation[type]
+	} else if (Array.isArray(type)) {
+		return activation[type[layerIndex]]
+	}
 }
 
 export function walk(network, accessor) {

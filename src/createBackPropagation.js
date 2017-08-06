@@ -95,7 +95,8 @@ function updateNetworkWeights(network, networkResult, networkError, activationTy
 		let currentInput = networkResult[path[0]][path[2]]
 		let currentResult = networkResult[path[0] + 1][path[1]]
 		let currentError = networkError[path[0]][path[1]]
-		let deltaWeight = -learningRate * currentError * currentInput * activation[activationType].derivative(currentResult)
+		let currentActivation = $network.getActivation(activationType, path[0])
+		let deltaWeight = -learningRate * currentError * currentInput * currentActivation.derivative(currentResult)
 		let newWeight = currentWeight + deltaWeight
 		network[path[0]][path[1]][path[2]] = newWeight
 	})

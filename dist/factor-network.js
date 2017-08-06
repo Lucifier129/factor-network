@@ -1,6 +1,6 @@
 /*!
  * factor-network.js v1.0.0
- * (c) 2017-08-01 Jade Gu
+ * (c) 2017-08-06 Jade Gu
  * Released under the MIT License.
  * @license
  */
@@ -96,13 +96,21 @@ function compute(network, inputs, activationType) {
 				var currentWeight = currentNode[k];
 				sum += currentInputs[k] * currentWeight;
 			}
-			var currentNodeResult = activation[activationType || 'SIGMOID'].output(sum);
+			var currentNodeResult = getActivation(activationType, i).output(sum);
 			currentLayerResult.push(currentNodeResult);
 		}
 		networkResult.push(currentLayerResult);
 		currentInputs = currentLayerResult;
 	}
 	return networkResult;
+}
+
+function getActivation(type, layerIndex) {
+	if (typeof type === 'string') {
+		return activation[type];
+	} else if (Array.isArray(type)) {
+		return activation[type[layerIndex]];
+	}
 }
 
 function walk(network, accessor) {
@@ -131,6 +139,7 @@ function copy(network) {
 var network = Object.freeze({
 	create: create,
 	compute: compute,
+	getActivation: getActivation,
 	walk: walk,
 	copy: copy
 });
@@ -219,7 +228,8 @@ function updateNetworkWeights(network, networkResult, networkError, activationTy
 		var currentInput = networkResult[path[0]][path[2]];
 		var currentResult = networkResult[path[0] + 1][path[1]];
 		var currentError = networkError[path[0]][path[1]];
-		var deltaWeight = -learningRate * currentError * currentInput * activation[activationType].derivative(currentResult);
+		var currentActivation = getActivation(activationType, path[0]);
+		var deltaWeight = -learningRate * currentError * currentInput * currentActivation.derivative(currentResult);
 		var newWeight = currentWeight + deltaWeight;
 		network[path[0]][path[1]][path[2]] = newWeight;
 	});

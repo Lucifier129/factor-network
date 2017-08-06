@@ -10,7 +10,7 @@ const {
 const evolution = createEvolution({
 	network: [2, 2, 1],
 	amount: 50,
-	activation: 'RELU',
+	activation: ['SIGMOID', 'RELU'],
 })
 
 export default class Evolution extends React.Component {
