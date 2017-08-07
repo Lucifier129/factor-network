@@ -5,13 +5,16 @@ let {
 	createBackPropagation,
 } = FactorNetwork
 
-module.exports = function createNEBP(options) {
+let defaults = {
+	learningRate: 0.1,
+	learningRange: 1,
+	activation: 'SIGMOID',
+}
+
+module.exports = function createNEBP(settings) {
+	let options = Object.assign({}, defaults, settings)
 	let evolution = createEvolution(options)
-	let learner = createBackPropagation({
-		network: options.network,
-		activation: options.activation,
-		learningRate: options.learningRate,
-	})
+	let learner = createBackPropagation(options)
 	let getOuput = options.output ? results => options.output(results[results.length - 1]) : results => results[results.length - 1]
 
 	let recoder = []
@@ -38,9 +41,8 @@ module.exports = function createNEBP(options) {
 		return outputList[outputList.length - 1]
 	}
 
-	function training(bestNetworkIndex) {
-		let bestNetwork = evolution.getNetworks()[bestNetworkIndex]
-		let target = recoder[bestNetworkIndex]
+	function training(index) {
+		let target = recoder[index]
 		let inputList = target.inputList
 		let outputList = target.outputList
 
@@ -50,8 +52,6 @@ module.exports = function createNEBP(options) {
 				outputList[i]
 			)
 		}
-
-		recoder = []
 	}
 
 	function insertLearnerToEvolution() {
@@ -61,11 +61,16 @@ module.exports = function createNEBP(options) {
 	}
 
 	function adjust(ranks) {
-		let result = evolution.adjust(ranks)
+		let learningRange = options.learningRange || 1
 
-		training(ranks[0])
+		while (--learningRange >= 0) {
+			training(ranks[learningRange])
+		}
+
+		recoder = []
 		insertLearnerToEvolution()
-		return result
+
+		return evolution.adjust(ranks)
 	}
 
 	return Object.assign({}, evolution, {

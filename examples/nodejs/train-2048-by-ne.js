@@ -11,16 +11,10 @@ let Board = require('../src/2048/Board')
 
 let NETWORK_PATH = path.join(__dirname, `./network/2048-ne.json`)
 
-let evolution = createNEBP({
-	network: [16, 8, 4],
-	amount: 100,
+let evolution = createEvolution({
+	network: [16, 24, 2],
+	amount: 1000,
 	activation: 'SIGMOID',
-	output: list => {
-		let indexOfMax = list.map(toObj).reduce(getMax).index
-		let result = Array.from({ length: 4 }).fill(0)
-		result[indexOfMax] = 1
-		return result
-	}
 })
 
 let maxScore = 0
@@ -58,6 +52,7 @@ function train() {
 	}
 	let sortList = list.sort(sortMax)
 	let ranks = sortList.map(getIndex)
+
 	evolution.adjust(ranks)
 
 	let end = Date.now()
@@ -81,15 +76,15 @@ function train() {
 
 function trainItem(index) {
 	let board = new Board()
-
 	playTotal += 1
 
 	while (!board.hasWon() || !board.hasLost()) {
 		let cells = getFlatList(board.cells)
 		let max = cells.reduce(getMax).value
-		let input = cells.map(({ value }) => value ? Math.log2(value) / Math.log2(max) : 0)
-		let output = evolution.output(index, input)
-		let direction = output.map(toObj).reduce(getMax).index
+		let input = cells.map(({ value }) => value ? 0.5 - Math.log2(value) / 12 : 0.5)
+		let results = evolution.compute(index, input)
+		let result = results[results.length - 1].map(value => value > 0.5 ? 1 : 0)
+		let direction = parseInt(result[0] + 10 * result[1], 2)
 		board.move(direction)
 		if (!board.hasChanged) {
 			deadTotal += 1
@@ -100,7 +95,7 @@ function trainItem(index) {
 	let max = getFlatList(board.cells).reduce(getMax).value
 	maxScore = Math.max(maxScore, board.score)
 	maxNumber = Math.max(maxNumber, max)
-	return board.score
+	return board.score + max
 }
 
 function getFlatList(list) {
