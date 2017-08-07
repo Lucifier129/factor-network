@@ -5,14 +5,22 @@ let {
 	createEvolution
 } = FactorNetwork
 
+let createNEBP = require('./createNEBP')
+
 let Board = require('../src/2048/Board')
 
 let NETWORK_PATH = path.join(__dirname, `./network/2048-ne.json`)
 
-let evolution = createEvolution({
-	network: [16, 4],
+let evolution = createNEBP({
+	network: [16, 8, 4],
 	amount: 100,
-	activation: 'SIGMOID'
+	activation: 'SIGMOID',
+	output: list => {
+		let indexOfMax = list.map(toObj).reduce(getMax).index
+		let result = Array.from({ length: 4 }).fill(0)
+		result[indexOfMax] = 1
+		return result
+	}
 })
 
 let maxScore = 0
@@ -73,19 +81,15 @@ function train() {
 
 function trainItem(index) {
 	let board = new Board()
-	let previousMove = 0
-
-	let illegalCount = 0
 
 	playTotal += 1
 
 	while (!board.hasWon() || !board.hasLost()) {
-		let cells = board.cells.map(row => row.map(({ value }) => value))
-		let input = getFlatList(cells).map(getValue)
-		let results = evolution.compute(index, input)
-		let direction = results[results.length - 1].map(toObj).reduce(getMax).index
-		previousMove = direction
-		// console.log('result', direction, results[results.length - 1])
+		let cells = getFlatList(board.cells)
+		let max = cells.reduce(getMax).value
+		let input = cells.map(({ value }) => value ? Math.log2(value) / Math.log2(max) : 0)
+		let output = evolution.output(index, input)
+		let direction = output.map(toObj).reduce(getMax).index
 		board.move(direction)
 		if (!board.hasChanged) {
 			deadTotal += 1
@@ -106,101 +110,6 @@ function getFlatList(list) {
 	let result = []
 	for (let i = 0; i < list.length; i++) {
 		result = result.concat(getFlatList(list[i]))
-	}
-	return result
-}
-
-function move(cells, direction) {
-	let clone = cells.map(cloneList)
-	if (direction === 0) {
-		return clone.map(moveLeft)
-	} else if (direction === 1) {
-		return rotateLeft(rotateRight(clone).map(moveRight))
-	} else if (direction === 2) {
-		return clone.map(moveRight)
-	} else if (direction === 3) {
-		return rotateLeft(rotateRight(clone).map(moveLeft))
-	}
-}
-
-function cloneList(list) {
-	return list.concat()
-}
-
-/**
- * @param {number[][]} matrix
- * @return {void} Do not return anything, modify matrix in-place instead.
- */
-function rotateRight(matrix) {
-  // reverse the rows
-  matrix = matrix.reverse();
-  // swap the symmetric elements
-  for (var i = 0; i < matrix.length; i++) {
-    for (var j = 0; j < i; j++) {
-      var temp = matrix[i][j];
-      matrix[i][j] = matrix[j][i];
-      matrix[j][i] = temp;
-    }
-  }
-  return matrix
-};
-
-/**
- * @param {number[][]} matrix
- * @return {void} Do not return anything, modify matrix in-place instead.
- */
-function rotateLeft(matrix) {
-  // reverse the individual rows
-  matrix = matrix.map(function(row) {
-    return row.reverse();
-  });
-  // swap the symmetric elements
-  for (var i = 0; i < matrix.length; i++) {
-    for (var j = 0; j < i; j++) {
-      var temp = matrix[i][j];
-      matrix[i][j] = matrix[j][i];
-      matrix[j][i] = temp;
-    }
-  }
-  return matrix
-};
-
-function moveLeft(list) {
-	let clone = list.concat()
-	while (clone[0] === 0) {
-		clone.shift()
-	}
-	let result = []
-	while (clone.length) {
-		let item = clone.shift()
-		if (result[result.length - 1] === item) {
-			result[result.length - 1] += item
-		} else {
-			result.push(item)
-		}
-	}
-	while (result.length < 4) {
-		result.push(0)
-	}
-	return result
-}
-
-function moveRight(list) {
-	let clone = list.concat()
-	while (clone[clone.length - 1] === 0) {
-		clone.pop()
-	}
-	let result = []
-	while (clone.length) {
-		let item = clone.pop()
-		if (result[result.length - 1] === item) {
-			result[result.length - 1] += item
-		} else {
-			result.unshift(item)
-		}
-	}
-	while (result.length < 4) {
-		result.unshift(0)
 	}
 	return result
 }

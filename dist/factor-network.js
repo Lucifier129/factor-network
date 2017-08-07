@@ -1,6 +1,6 @@
 /*!
- * factor-network.js v1.0.0
- * (c) 2017-08-06 Jade Gu
+ * factor-network.js v1.0.1
+ * (c) 2017-08-07 Jade Gu
  * Released under the MIT License.
  * @license
  */
@@ -16,6 +16,10 @@ function randomClamped() {
 
 function randomBoolean() {
 	return Math.random() <= 0.5;
+}
+
+function identity(x) {
+	return x;
 }
 
 var activation = {
@@ -136,18 +140,24 @@ function copy(network) {
 	return JSON.parse(JSON.stringify(network));
 }
 
+function isEqual(aNetwork, bNetwork) {
+	return JSON.stringify(aNetwork) === JSON.stringify(bNetwork);
+}
+
 var network = Object.freeze({
 	create: create,
 	compute: compute,
 	getActivation: getActivation,
 	walk: walk,
-	copy: copy
+	copy: copy,
+	isEqual: isEqual
 });
 
 var defaults = {
 	network: [2, 2, 1],
 	activation: 'SIGMOID',
-	learningRate: 0.1
+	learningRate: 0.1,
+	output: identity
 };
 
 function createBackPropagation(settings) {
@@ -166,6 +176,11 @@ function createBackPropagation(settings) {
 	function compute$$1(inputs) {
 		networkResult = compute(network, inputs, options.activation);
 		return networkResult;
+	}
+
+	function output(index, inputs) {
+		var results = compute$$1(inputs);
+		return options.output(results[results.length - 1]);
 	}
 
 	function computeError(labels) {
@@ -194,7 +209,8 @@ function createBackPropagation(settings) {
 		replaceNetwork: replaceNetwork,
 		compute: compute$$1,
 		adjust: adjust,
-		train: train
+		train: train,
+		output: output
 	};
 }
 
@@ -245,7 +261,8 @@ var defaults$1 = {
 		rate: 0.1,
 		range: 0.5
 	},
-	activation: 'SIGMOID'
+	activation: 'SIGMOID',
+	output: identity
 };
 
 function createEvolution(settings) {
@@ -258,6 +275,10 @@ function createEvolution(settings) {
 			networks.push(network);
 		}
 		options.amount = networks.length;
+	}
+
+	function eachNetwork(handleNetwork) {
+		networks.forEach(handleNetwork);
 	}
 
 	function updateAmount(targetAmount) {
@@ -289,6 +310,11 @@ function createEvolution(settings) {
 
 	function compute$$1(index, inputs) {
 		return compute(networks[index], inputs, options.activation);
+	}
+
+	function output(index, inputs) {
+		var results = compute$$1(index, inputs);
+		return options.output(results[results.length - 1]);
 	}
 
 	function adjust(ranks) {
@@ -333,12 +359,14 @@ function createEvolution(settings) {
 	return {
 		options: options,
 		createNetworks: createNetworks,
+		eachNetwork: eachNetwork,
 		getNetworks: getNetworks,
 		replaceNetworks: replaceNetworks,
 		sortNetworks: sortNetworks,
 		updateAmount: updateAmount,
 		compute: compute$$1,
-		adjust: adjust
+		adjust: adjust,
+		output: output
 	};
 }
 

@@ -74,3 +74,7 @@ export function walk(network, accessor) {
 export function copy(network) {
 	return JSON.parse(JSON.stringify(network))
 }
+
+export function isEqual(aNetwork, bNetwork) {
+	return JSON.stringify(aNetwork) === JSON.stringify(bNetwork)
+}

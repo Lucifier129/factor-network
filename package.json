@@ -1,6 +1,6 @@
 {
   "name": "factor-network",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple factor network implementation written by JavaScript",
   "main": "./dist/factor-network.js",
   "scripts": {

@@ -1,6 +1,7 @@
 import {
+	identity,
 	randomBoolean,
-	randomClamped
+	randomClamped,
 } from './util'
 import * as $network from './network'
 
@@ -14,7 +15,8 @@ const defaults = {
 		rate: 0.1,
 		range: 0.5,
 	},
-	activation: 'SIGMOID'
+	activation: 'SIGMOID',
+	output: identity,
 }
 
 export default function createEvolution(settings) {
@@ -27,6 +29,10 @@ export default function createEvolution(settings) {
 			networks.push(network)
 		}
 		options.amount = networks.length
+	}
+
+	function eachNetwork(handleNetwork) {
+		networks.forEach(handleNetwork)
 	}
 
 	function updateAmount(targetAmount) {
@@ -62,6 +68,11 @@ export default function createEvolution(settings) {
 			inputs,
 			options.activation
 		)
+	}
+
+	function output(index, inputs) {
+		let results = compute(index, inputs)
+		return options.output(results[results.length - 1])
 	}
 
 	function adjust(ranks) {
@@ -110,12 +121,14 @@ export default function createEvolution(settings) {
 	return {
 		options: options,
 		createNetworks: createNetworks,
+		eachNetwork: eachNetwork,
 		getNetworks: getNetworks,
 		replaceNetworks: replaceNetworks,
 		sortNetworks: sortNetworks,
 		updateAmount: updateAmount,
 		compute: compute,
 		adjust: adjust,
+		output: output,
 	}
 }
 

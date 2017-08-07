@@ -1,10 +1,11 @@
 import * as $network from './network'
-import { activation } from './util'
+import { activation, identity } from './util'
 
 const defaults = {
 	network: [2, 2, 1],
 	activation: 'SIGMOID',
 	learningRate: 0.1,
+	output: identity,
 }
 
 export default function createBackPropagation(settings) {
@@ -27,6 +28,11 @@ export default function createBackPropagation(settings) {
 			options.activation
 		)
 		return networkResult
+	}
+
+	function output(index, inputs) {
+		let results = compute(inputs)
+		return options.output(results[results.length - 1])
 	}
 
 	function computeError(labels) {
@@ -62,6 +68,7 @@ export default function createBackPropagation(settings) {
 		compute: compute,
 		adjust: adjust,
 		train: train,
+		output: output,
 	}
 }
 

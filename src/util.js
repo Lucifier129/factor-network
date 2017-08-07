@@ -6,6 +6,10 @@ export function randomBoolean() {
 	return Math.random() <= 0.5
 }
 
+export function identity(x) {
+	return x
+}
+
 export const activation = {
 	RELU: {
 		output: RELU,
