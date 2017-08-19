@@ -45,14 +45,14 @@ export default function createBackPropagation(settings) {
 		return computeNetworkError(network, errors)
 	}
 
-	function adjust(labels) {
+	function adjust(labels, learningRate=options.learningRate) {
 		let networkError = computeError(labels)
 		updateNetworkWeights(
 			network,
 			networkResult,
 			networkError,
 			options.activation,
-			options.learningRate
+			learningRate
 		)
 	}
 

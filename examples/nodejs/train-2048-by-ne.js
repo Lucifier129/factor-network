@@ -12,9 +12,9 @@ let Board = require('../src/2048/Board')
 let NETWORK_PATH = path.join(__dirname, `./network/2048-ne.json`)
 
 let evolution = createEvolution({
-	network: [16, 24, 2],
-	amount: 1000,
-	activation: 'SIGMOID',
+	network: [16, 256, 18, 2],
+	amount: 200,
+	activation: ['RELU', 'SIGMOID', 'SIGMOID'],
 })
 
 let maxScore = 0
@@ -29,7 +29,7 @@ try {
 }
 
 Array.from({
-	length: 1000
+	length: 100000
 }).map(train)
 save()
 console.log({
@@ -81,7 +81,7 @@ function trainItem(index) {
 	while (!board.hasWon() || !board.hasLost()) {
 		let cells = getFlatList(board.cells)
 		let max = cells.reduce(getMax).value
-		let input = cells.map(({ value }) => value ? 0.5 - Math.log2(value) / 12 : 0.5)
+		let input = cells.map(({ value }) => value ? Math.log2(value) / 12 : 0)
 		let results = evolution.compute(index, input)
 		let result = results[results.length - 1].map(value => value > 0.5 ? 1 : 0)
 		let direction = parseInt(result[0] + 10 * result[1], 2)
