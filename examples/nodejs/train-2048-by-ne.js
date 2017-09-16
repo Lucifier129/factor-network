@@ -14,7 +14,7 @@ let NETWORK_PATH = path.join(__dirname, `./network/2048-ne.json`)
 let evolution = createEvolution({
 	network: [16, 256, 18, 2],
 	amount: 200,
-	activation: ['RELU', 'SIGMOID', 'SIGMOID'],
+	activation: 'SIGMOID',
 })
 
 let maxScore = 0
@@ -29,7 +29,7 @@ try {
 }
 
 Array.from({
-	length: 100000
+	length: 100
 }).map(train)
 save()
 console.log({

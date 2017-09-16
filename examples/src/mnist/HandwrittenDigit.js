@@ -1,6 +1,6 @@
 import React from 'react'
 import FactorNetwork from '../../../dist/factor-network'
-import network from '../../nodejs/network/bp'
+import network from '../../nodejs/network/mnist-bp'
 import * as utils from './utils'
 
 let {
@@ -39,7 +39,7 @@ export default class HandwrittenDigit extends React.Component {
 		}
 		let ctx = this.getCtx()
 		let { layerX, layerY } = event.nativeEvent
-		ctx.lineWidth = 20
+		ctx.lineWidth = 18
       	ctx.lineJoin = ctx.lineCap = 'round'
       	ctx.strokeStyle = '#393E46'
 
@@ -103,6 +103,7 @@ export default class HandwrittenDigit extends React.Component {
 	}
 
 	handleInput = (input) => {
+		logNumber(input)
 		let results = $network.compute(network, input)
 		let output = results[results.length - 1]
 		let stats = output.map((output, number) => ({ output, number }))
@@ -116,6 +117,16 @@ export default class HandwrittenDigit extends React.Component {
 	render() {
 		return (
 			<div>
+				<div>
+					<h3>Description</h3>
+					<ul>
+						<li>Use <a href="https://en.wikipedia.org/wiki/MNIST_database" target="_blank">MNIST  Database</a></li>
+						<li>Use [784, 100, 10] of network</li>
+						<li>Use Backpropagation to train neural network</li>
+						<li>Wait for error rate reach 6%</li>
+						<li><strong>Write down your own digit below!!!</strong></li>
+					</ul>
+				</div>
 				<canvas
 					style={{ border: '15px solid rgba(27,188,155,.3)' }}
 					ref="canvas"
@@ -154,4 +165,17 @@ export default class HandwrittenDigit extends React.Component {
 	}
 }
 
+
+function logNumber(input) {
+	let logList = []
+	for (let i = 0; i < 28; i++) {
+		let list = []
+		for (let j = 0; j < 28; j++) {
+			list.push(input[i * 28 + j] > 0 ? '0' : '1')
+		}
+		logList.push(list.join(''))
+	}
+
+	console.log(logList.join('\n'))
+}
 

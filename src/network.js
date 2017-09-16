@@ -22,7 +22,7 @@ export function create(options) {
 	return network
 }
 
-export function compute(network, inputs, activationType) {
+export function compute(network, inputs, activationType='SIGMOID') {
 	let currentInputs = inputs
 	let networkResult = [inputs.concat()]
 	for (let i = 0; i < network.length; i++) {

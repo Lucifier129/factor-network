@@ -105,19 +105,6 @@ export default class Evolution extends React.Component {
 	render() {
 		return (
 			<div>
-				<canvas id="flappy" width="500" height="512"></canvas>
-				<br/>
-				<button onClick={this.handleSwitchSpeed} data-speed="60">x1</button>
-				<button onClick={this.handleSwitchSpeed} data-speed="120">x2</button>
-				<button onClick={this.handleSwitchSpeed} data-speed="180">x3</button>
-				<button onClick={this.handleSwitchSpeed} data-speed="380">x5</button>
-				<button onClick={this.handleSwitchSpeed} data-speed="0">MAX</button>
-				<br />
-				<input
-					value={this.state.amount}
-					onChange={({ currentTarget }) => this.setState({ amount: currentTarget.value })}
-				/>
-				<button onClick={this.hanldeUpdateAmount}>update birds amount</button>
 				<div>
 					<h3>Description</h3>
 					<ul>
@@ -131,6 +118,19 @@ export default class Evolution extends React.Component {
 						<li>Repeat the steps above</li>
 					</ul>
 				</div>
+				<canvas id="flappy" width="500" height="512"></canvas>
+				<br/>
+				<button onClick={this.handleSwitchSpeed} data-speed="60">x1</button>
+				<button onClick={this.handleSwitchSpeed} data-speed="120">x2</button>
+				<button onClick={this.handleSwitchSpeed} data-speed="180">x3</button>
+				<button onClick={this.handleSwitchSpeed} data-speed="380">x5</button>
+				<button onClick={this.handleSwitchSpeed} data-speed="0">MAX</button>
+				<br />
+				<input
+					value={this.state.amount}
+					onChange={({ currentTarget }) => this.setState({ amount: currentTarget.value })}
+				/>
+				<button onClick={this.hanldeUpdateAmount}>update birds amount</button>
 			</div>
 		)
 	}

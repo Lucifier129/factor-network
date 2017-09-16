@@ -13,7 +13,7 @@ const routes = {
 	'Flappy-Bird: Back-Propagation': BackPropagation,
 	'Flappy-Bird: Ten-Masters': Master,
 	'Mnist: Handwritten-Digit': HandwrittenDigit,
-	'Game-2048: Neuroevolution': BoardView2048
+	// 'Game-2048: Neuroevolution': BoardView2048
 }
 
 function Menu() {

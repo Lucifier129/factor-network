@@ -80,6 +80,16 @@ export default class Evolution extends React.Component {
 	render() {
 		return (
 			<div>
+				<div>
+					<h3>Description</h3>
+					<ul>
+						<li>Generate {this.state.amount} birds</li>
+						<li>Order birds by their score(Higher is better)</li>
+						<li>Make the birds with higher score breed more</li>
+						<li>Make the birds with lower score breed less or eliminate</li>
+						<li>Repeat the steps above</li>
+					</ul>
+				</div>
 				<canvas id="flappy" width="500" height="512"></canvas>
 				<br/>
 				<button onClick={this.handleSwitchSpeed} data-speed="60">x1</button>
@@ -93,16 +103,6 @@ export default class Evolution extends React.Component {
 					onChange={({ currentTarget }) => this.setState({ amount: currentTarget.value })}
 				/>
 				<button onClick={this.hanldeUpdateAmount}>update birds amount</button>
-				<div>
-					<h3>Description</h3>
-					<ul>
-						<li>Generate {this.state.amount} birds</li>
-						<li>Order birds by their score(Higher is better)</li>
-						<li>Make the birds with higher score breed more</li>
-						<li>Make the birds with lower score breed less or eliminate</li>
-						<li>Repeat the steps above</li>
-					</ul>
-				</div>
 			</div>
 		)
 	}

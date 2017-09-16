@@ -11,7 +11,7 @@ let {
 	test: testData,
 } = mnist.set(200, 100)
 
-const NETWORK_PATH = path.join(__dirname, `./network/ne.json`)
+const NETWORK_PATH = path.join(__dirname, `./network/mnist-ne.json`)
 const INPUT_LENGTH = 28 * 28
 
 let evolution = createEvolution({

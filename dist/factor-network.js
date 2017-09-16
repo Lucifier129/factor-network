@@ -1,6 +1,6 @@
 /*!
  * factor-network.js v1.0.1
- * (c) 2017-08-07 Jade Gu
+ * (c) 2017-09-16 Jade Gu
  * Released under the MIT License.
  * @license
  */
@@ -87,7 +87,9 @@ function create(options) {
 	return network;
 }
 
-function compute(network, inputs, activationType) {
+function compute(network, inputs) {
+	var activationType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'SIGMOID';
+
 	var currentInputs = inputs;
 	var networkResult = [inputs.concat()];
 	for (var i = 0; i < network.length; i++) {
@@ -194,8 +196,10 @@ function createBackPropagation(settings) {
 	}
 
 	function adjust(labels) {
+		var learningRate = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.learningRate;
+
 		var networkError = computeError(labels);
-		updateNetworkWeights(network, networkResult, networkError, options.activation, options.learningRate);
+		updateNetworkWeights(network, networkResult, networkError, options.activation, learningRate);
 	}
 
 	function train(inputs, labels) {
