@@ -14,6 +14,18 @@ export default class HandwrittenDigit extends React.Component {
 	}
 	isDrawing = false
 	strokes = []
+	componentDidMount() {
+		let { canvas } = this.refs
+		let options = {
+			passive: false,
+		}
+		canvas.addEventListener('mousedown', this.handleDrawStart, options)
+		canvas.addEventListener('mousemove', this.handleDrawing, options)
+		canvas.addEventListener('mouseup', this.handleDrawEnd, options)
+		canvas.addEventListener('touchstart', this.handleDrawStart, options)
+		canvas.addEventListener('touchmove', this.handleDrawing, options)
+		canvas.addEventListener('touchend', this.handleDrawEnd, options)
+	}
 	getCtx() {
 		let { canvas } = this.refs
 		let ctx = canvas.getContext('2d')
@@ -30,21 +42,23 @@ export default class HandwrittenDigit extends React.Component {
 		})
 	}
 	handleDrawStart = event => {
+		event.preventDefault()
 		this.isDrawing = true
 		this.strokes.push([])
 	}
 	handleDrawing = (event) => {
+		event.preventDefault()
 		if (!this.isDrawing) {
 			return
 		}
 		let ctx = this.getCtx()
-		let { layerX, layerY } = event.nativeEvent
+		let { layerX, layerY } = event
 		ctx.lineWidth = 18
       	ctx.lineJoin = ctx.lineCap = 'round'
       	ctx.strokeStyle = '#393E46'
 
       	let points = this.strokes[this.strokes.length - 1]
-      	points.push(utils.getCoordinates(event.nativeEvent))
+      	points.push(utils.getCoordinates(event))
       	// draw individual strokes
 	      for (let s = 0, slen = this.strokes.length; s < slen; s++) {
 	        points = this.strokes[s]
@@ -132,12 +146,6 @@ export default class HandwrittenDigit extends React.Component {
 					ref="canvas"
 					width="240"
 					height="240"
-					onMouseDown={this.handleDrawStart}
-					onMouseMove={this.handleDrawing}
-					onMouseUp={this.handleDrawEnd}
-					onTouchStart={this.handleDrawStart}
-					onTouchMove={this.handleDrawing}
-					onTouchEnd={this.handleDrawEnd}
 				/>
 				<canvas id="input-canvas-scaled" width="28" height="28" style={{ display: ''}}></canvas>
            		<canvas id="input-canvas-centercrop" style={{ display: 'none'}}></canvas>

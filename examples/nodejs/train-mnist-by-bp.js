@@ -8,7 +8,7 @@ let {
 let {
 	training: trainingData,
 	test: testData,
-} = mnist.set(0, 2500)
+} = mnist.set(100, 2500)
 
 const NETWORK_PATH = path.join(__dirname, `./network/mnist-bp.json`)
 const INPUT_LENGTH = 28 * 28

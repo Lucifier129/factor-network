@@ -8,11 +8,11 @@ import HandwrittenDigit from './mnist/HandwrittenDigit'
 import BoardView2048 from './2048' 
 
 const routes = {
-	'Flappy-Bird: Neuroevolution-Without-Labeled-Data': Evolution,
-	'Flappy-Bird: Neuroevolution-With-Labeled-Data': EvolutionWithLabel,
-	'Flappy-Bird: Back-Propagation': BackPropagation,
-	'Flappy-Bird: Ten-Masters': Master,
-	'Mnist: Handwritten-Digit': HandwrittenDigit,
+	'Flappy-Bird-Of-Neuroevolution-Without-Labeled-Data': Evolution,
+	'Flappy-Bird-Of-Neuroevolution-With-Labeled-Data': EvolutionWithLabel,
+	'Flappy-Bird-Of-Back-Propagation': BackPropagation,
+	'Flappy-Bird-Of-Ten-Masters': Master,
+	'MNIST-Handwritten-Digit-Of-Back-Propagation': HandwrittenDigit,
 	// 'Game-2048: Neuroevolution': BoardView2048
 }
 
