@@ -114,6 +114,7 @@ export default class BoardView extends React.Component {
 						<li>do Selection -> Expansion -> Simulation -> Backpropagation for 400 times</li>
 						<li>pick the action of the highest win rate</li>
 						<li>Repeat the steps above</li>
+						<li>Click the button below to toggle AI</li>
 					</ul>
 				</div>
 				<h3>Score: {this.state.board.score}</h3>
@@ -131,7 +132,7 @@ export default class BoardView extends React.Component {
 					/>
 				</div>
 				<div>
-					<button onClick={this.handleToggleAIPlay}>Play By AI</button>
+					<button onClick={this.handleToggleAIPlay}>Toggle AI</button>
 				</div>
 			</div>
 		)
