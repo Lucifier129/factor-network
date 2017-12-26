@@ -9,5 +9,6 @@ The [demo](https://lucifier129.github.io/factor-network/examples/build) is inspi
 - [Neuroevolution](http://www.scholarpedia.org/article/Neuroevolution)
 - [Backpropagation](https://en.wikipedia.org/wiki/Backpropagation)
 - [Principles of training multi-layer neural network using backpropagation](http://galaxy.agh.edu.pl/~vlsi/AI/backp_t_en/backprop.html)
-
+- [Monte Carlo method](https://en.wikipedia.org/wiki/Monte_Carlo_method)
+- [Monte Carlo tree search](https://en.wikipedia.org/wiki/Monte_Carlo_tree_search)
 
