@@ -15,8 +15,8 @@ These demo is inspired by [FlappyLearning](https://github.com/xviniette/FlappyLe
 - [MNIST-Handwritten-Digit-Of-Back-Propagation](https://lucifier129.github.io/factor-network/examples/build/#MNIST-Handwritten-Digit-Of-Back-Propagation)
 
 ### 2048
-- [Game-2048: Monte-Carlo Method](https://lucifier129.github.io/factor-network/examples/build/#Game-2048: Monte-Carlo Method)
-- [Game-2048: Monte-Carlo Tree Search](https://lucifier129.github.io/factor-network/examples/build/#Game-2048: Monte-Carlo Tree Search)
+- [Game-2048: Monte-Carlo Method](https://lucifier129.github.io/factor-network/examples/build/#Game-2048-Of-Monte-Carlo-Method)
+- [Game-2048: Monte-Carlo Tree Search](https://lucifier129.github.io/factor-network/examples/build/#Game-2048-Of-Monte-Carlo-Tree-Search)
 
 ## Knowledge
 - [Artificial neural network](https://en.wikipedia.org/wiki/Artificial_neural_network)

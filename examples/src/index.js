@@ -14,8 +14,8 @@ const routes = {
 	'Flappy-Bird-Of-Back-Propagation': BackPropagation,
 	'Flappy-Bird-Of-Ten-Masters': Master,
 	'MNIST-Handwritten-Digit-Of-Back-Propagation': HandwrittenDigit,
-	'Game-2048: Monte-Carlo Method': MCM2048,
-	'Game-2048: Monte-Carlo Tree Search': MCTS2048
+	'Game-2048-Of-Monte-Carlo-Method': MCM2048,
+	'Game-2048-Of-Monte-Carlo-Tree-Search': MCTS2048
 }
 
 function Menu() {
