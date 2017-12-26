@@ -1,6 +1,6 @@
 /*!
  * factor-network.js v1.0.1
- * (c) 2017-09-16 Jade Gu
+ * (c) 2017-12-26 Jade Gu
  * Released under the MIT License.
  * @license
  */
@@ -388,10 +388,233 @@ function mixNetwork(targetNetwork, sourceNetwork, mutation) {
 	return targetNetwork;
 }
 
+var classCallCheck = function (instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+var createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
+    return Constructor;
+  };
+}();
+
+var MCM = function () {
+	function MCM(board) {
+		classCallCheck(this, MCM);
+
+		this.originalBoard = board;
+		this.statistic = [];
+	}
+
+	createClass(MCM, [{
+		key: "run",
+		value: function run(iterations) {
+			var count = Number(iterations);
+			while (count--) {
+				this.simulate();
+			}
+			return this.getBestAction();
+		}
+	}, {
+		key: "simulate",
+		value: function simulate() {
+			var board = this.originalBoard.clone();
+			var actions = board.getActions();
+			var path = [];
+			while (actions.length) {
+				var action = actions[Math.floor(Math.random() * actions.length)];
+				path.push(action);
+				board.doAction(action);
+				actions = board.getActions();
+			}
+			this.updateStatistic(path[0], board.getResult());
+		}
+	}, {
+		key: "updateStatistic",
+		value: function updateStatistic(action, score) {
+			var target = this.statistic.find(function (item) {
+				return item.action === action;
+			});
+			if (!target) {
+				this.statistic.push({
+					action: action,
+					score: score
+				});
+			} else {
+				target.score += score;
+			}
+		}
+	}, {
+		key: "getBestAction",
+		value: function getBestAction() {
+			return this.statistic.reduce(function (best, current) {
+				return current.score > best.score ? current : best;
+			}).action;
+		}
+	}]);
+	return MCM;
+}();
+
+var MCTS = function () {
+	function MCTS(board) {
+		classCallCheck(this, MCTS);
+
+		this.originalBoard = board;
+		this.board = null;
+	}
+
+	createClass(MCTS, [{
+		key: "run",
+		value: function run(iterations) {
+			var count = Number(iterations);
+			var root = new MCTSNode(null, this.originalBoard.getActions(), null);
+			while (count--) {
+				this.board = this.originalBoard.clone();
+				var node = root;
+				node = this.Selection(node);
+				node = this.Expanstion(node);
+				this.Simulation(node);
+				this.Backpropagation(node);
+			}
+			return root.getBestAction();
+		}
+	}, {
+		key: "Selection",
+		value: function Selection(node) {
+			while (!node.hasUnexaminedAction() && node.children.length > 0) {
+				node = node.selectChild();
+				this.board.doAction(node.action);
+			}
+			return node;
+		}
+	}, {
+		key: "Expanstion",
+		value: function Expanstion(node) {
+			if (node.hasUnexaminedAction()) {
+				var unexamineAction = node.getUnexamineActionRandomly();
+				this.board.doAction(unexamineAction);
+				node = node.addChild(unexamineAction, this.board.getActions());
+			}
+			return node;
+		}
+	}, {
+		key: "Simulation",
+		value: function Simulation(node) {
+			var actions = this.board.getActions();
+			while (actions.length > 0) {
+				var randomAction = actions[Math.floor(Math.random() * actions.length)];
+				this.board.doAction(randomAction);
+				actions = this.board.getActions();
+			}
+		}
+	}, {
+		key: "Backpropagation",
+		value: function Backpropagation(node) {
+			node.updateStatistic(this.board.getResult());
+		}
+	}]);
+	return MCTS;
+}();
+
+var MCTSNode = function () {
+	function MCTSNode(action, nextActions) {
+		var parent = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+		classCallCheck(this, MCTSNode);
+
+		this.action = action;
+		this.nextActions = nextActions || [];
+		this.children = [];
+		this.wins = 0;
+		this.visits = 0;
+		this.parent = parent;
+	}
+
+	createClass(MCTSNode, [{
+		key: "isRoot",
+		value: function isRoot() {
+			return !this.parent;
+		}
+	}, {
+		key: "hasUnexaminedAction",
+		value: function hasUnexaminedAction() {
+			return this.nextActions.length > 0;
+		}
+	}, {
+		key: "getUnexamineActionRandomly",
+		value: function getUnexamineActionRandomly() {
+			var index = Math.floor(Math.random() * this.nextActions.length);
+			var action = this.nextActions.splice(index, 1)[0];
+			return action;
+		}
+	}, {
+		key: "getScore",
+		value: function getScore() {
+			return this.visits > 0 ? this.wins / this.visits : 0;
+		}
+	}, {
+		key: "getBestChild",
+		value: function getBestChild() {
+			var best = this.children[0];
+			for (var i = 1; i < this.children.length; i++) {
+				var child = this.children[i];
+				if (child.getScore() > best.getScore()) {
+					best = child;
+				}
+			}
+			return best;
+		}
+	}, {
+		key: "getBestAction",
+		value: function getBestAction() {
+			return this.getBestChild().action;
+		}
+	}, {
+		key: "addChild",
+		value: function addChild(action, nextActions) {
+			var child = new MCTSNode(action, nextActions, this);
+			this.children.push(child);
+			return child;
+		}
+	}, {
+		key: "selectChild",
+		value: function selectChild() {
+			return this.children[Math.floor(Math.random() * this.children.length)];
+		}
+	}, {
+		key: "updateStatistic",
+		value: function updateStatistic() {
+			var wins = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+
+			this.visits += 1;
+			this.wins += wins;
+			if (!this.isRoot()) {
+				this.parent.updateStatistic(wins);
+			}
+		}
+	}]);
+	return MCTSNode;
+}();
+
 var index = {
 	network: network,
 	createBackPropagation: createBackPropagation,
-	createEvolution: createEvolution
+	createEvolution: createEvolution,
+	MCM: MCM,
+	MCTS: MCTS
 };
 
 return index;

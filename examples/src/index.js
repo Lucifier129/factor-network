@@ -5,7 +5,8 @@ import EvolutionWithLabel from './flappy-learning/Evolution-with-label'
 import BackPropagation from './flappy-learning/BackPropagation'
 import Master from './flappy-learning/Master'
 import HandwrittenDigit from './mnist/HandwrittenDigit'
-import BoardView2048 from './2048' 
+import MCM2048 from './2048/MCM'
+import MCTS2048 from './2048/MCTS'
 
 const routes = {
 	'Flappy-Bird-Of-Neuroevolution-Without-Labeled-Data': Evolution,
@@ -13,44 +14,44 @@ const routes = {
 	'Flappy-Bird-Of-Back-Propagation': BackPropagation,
 	'Flappy-Bird-Of-Ten-Masters': Master,
 	'MNIST-Handwritten-Digit-Of-Back-Propagation': HandwrittenDigit,
-	// 'Game-2048: Neuroevolution': BoardView2048
+	'Game-2048: Monte-Carlo Method': MCM2048,
+	'Game-2048: Monte-Carlo Tree Search': MCTS2048
 }
 
 function Menu() {
 	return (
 		<ul>
 			<h1>Factor-Network</h1>
-			<h2>Powered by <a href="https://github.com/Lucifier129/factor-network">GitHub: Factor-Network</a></h2>
-			{
-				Object.keys(routes).map(route => {
-					return (
-						<li key={route}>
-							<a href={`#${route}`}>{route}</a>
-						</li>
-					)
-				})
-			}
+			<h2>
+				Powered by{' '}
+				<a href="https://github.com/Lucifier129/factor-network">
+					GitHub: Factor-Network
+				</a>
+			</h2>
+			{Object.keys(routes).map(route => {
+				return (
+					<li key={route}>
+						<a href={`#${route}`}>{route}</a>
+					</li>
+				)
+			})}
 		</ul>
 	)
 }
 
 function App() {
-	let Component = routes[location.hash.substr(1)] || routes[Object.keys(routes)[0]]
+	let Component =
+		routes[location.hash.substr(1)] || routes[Object.keys(routes)[0]]
 	return (
 		<div>
 			<Menu />
-			{ !!Component &&
-				<Component />
-			}
+			{!!Component && <Component />}
 		</div>
 	)
 }
 
 function render() {
-	ReactDOM.render(
-		<App />,
-		document.getElementById('root')
-	)
+	ReactDOM.render(<App />, document.getElementById('root'))
 }
 
 render()
