@@ -109,7 +109,7 @@ export default class BoardView extends React.Component {
 				<div>
 					<h3>Description</h3>
 					<ul>
-						<li>Follow the Monte-Carlo Tree Search</li>
+						<li>Follow the UCT</li>
 						<li>build a tree about each action</li>
 						<li>do Selection -> Expansion -> Simulation -> Backpropagation for 400 times</li>
 						<li>pick the action of the highest win rate</li>
