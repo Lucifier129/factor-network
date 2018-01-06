@@ -21,12 +21,7 @@ function adapter(board) {
   }
 
   function getActions() {
-    if (
-      board.hasChanged &&
-      !board.hasWon() &&
-      !board.hasLost() &&
-      getHighestValue() < 2048
-    ) {
+    if (!board.hasWon() && !board.hasLost() && getHighestValue() < 2048) {
       return [0, 1, 2, 3]
     } else {
       return []
@@ -35,6 +30,7 @@ function adapter(board) {
 
   function doAction(action) {
     board.move(action)
+    return board.hasChanged
   }
 
   function getHighestValue() {

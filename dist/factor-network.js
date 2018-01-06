@@ -1,6 +1,6 @@
 /*!
  * factor-network.js v1.0.1
- * (c) 2018-01-01 Jade Gu
+ * (c) 2018-01-06 Jade Gu
  * Released under the MIT License.
  * @license
  */
@@ -642,7 +642,7 @@ var UCT = function () {
         var node = root;
         node = this.Selection(node);
         node = this.Expanstion(node);
-        this.Simulation(node);
+        this.Simulation();
         this.Backpropagation(node);
       }
       return root.getBestAction();
@@ -668,7 +668,7 @@ var UCT = function () {
     }
   }, {
     key: "Simulation",
-    value: function Simulation(node) {
+    value: function Simulation() {
       var actions = this.board.getActions();
       while (actions.length > 0) {
         var randomAction = actions[Math.floor(Math.random() * actions.length)];
@@ -723,16 +723,16 @@ var UCTNode = function () {
   }, {
     key: "getBestChild",
     value: function getBestChild() {
-      var target = this.children[0];
+      var best = this.children[0];
       for (var i = 1; i < this.children.length; i++) {
         var child = this.children[i];
-        if (child.visits > target.visits) {
-          target = child;
-        } else if (child.visits === target.visits) {
-          target = child.wins > target.wins ? child : target;
+        if (child.visits > best.visits) {
+          best = child;
+        } else if (child.visits === best.visits) {
+          best = child.wins > best.wins ? child : best;
         }
       }
-      return target;
+      return best;
     }
   }, {
     key: "getBestAction",
@@ -743,8 +743,8 @@ var UCTNode = function () {
     key: "getUCTValue",
     value: function getUCTValue() {
       var averageReward = this.getScore();
-      var Cp = this.parent.getScore();
-      var bias = Cp * Math.sqrt(2 * Math.log(this.parent.visits) / this.visits);
+      var parameter = this.parent.getScore();
+      var bias = parameter * Math.sqrt(2 * Math.log(this.parent.visits) / this.visits);
       return averageReward + bias;
     }
   }, {

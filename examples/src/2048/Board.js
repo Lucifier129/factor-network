@@ -80,7 +80,7 @@ var Board = function() {
 	this.setPositions()
 	this.won = false
 	this.score = 0
-	this.hasChanged = true
+	this.hasChanged = false
 }
 
 Board.prototype.clone = function() {

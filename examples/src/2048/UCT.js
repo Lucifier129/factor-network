@@ -31,9 +31,8 @@ export default class BoardView extends React.Component {
 		console.time('ai')
 		let action = getBestActionByUCT(this.state.board)
 		console.timeEnd('ai')
-		this.setState({
-			board: this.state.board.move(action)
-		})
+		this.state.board.move(action)
+		this.forceUpdate()
 	}
 	restartGame() {
 		this.setState({ board: new Board() })

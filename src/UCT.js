@@ -11,7 +11,7 @@ export default class UCT {
       let node = root
       node = this.Selection(node)
       node = this.Expanstion(node)
-      this.Simulation(node)
+      this.Simulation()
       this.Backpropagation(node)
     }
     return root.getBestAction()
@@ -31,7 +31,7 @@ export default class UCT {
     }
     return node
   }
-  Simulation(node) {
+  Simulation() {
     let actions = this.board.getActions()
     while (actions.length > 0) {
       let randomAction = actions[Math.floor(Math.random() * actions.length)]
@@ -68,24 +68,25 @@ class UCTNode {
     return this.visits > 0 ? this.wins / this.visits : 0
   }
   getBestChild() {
-    let target = this.children[0]
+    let best = this.children[0]
     for (let i = 1; i < this.children.length; i++) {
       let child = this.children[i]
-      if (child.visits > target.visits) {
-        target = child
-      } else if (child.visits === target.visits) {
-        target = child.wins > target.wins ? child : target
+      if (child.visits > best.visits) {
+        best = child
+      } else if (child.visits === best.visits) {
+        best = child.wins > best.wins ? child : best
       }
     }
-    return target
+    return best
   }
   getBestAction() {
     return this.getBestChild().action
   }
   getUCTValue() {
     let averageReward = this.getScore()
-    let Cp = this.parent.getScore()
-    let bias = Cp * Math.sqrt(2 * Math.log(this.parent.visits) / this.visits)
+    let parameter = this.parent.getScore()
+    let bias =
+      parameter * Math.sqrt(2 * Math.log(this.parent.visits) / this.visits)
     return averageReward + bias
   }
   addChild(action, nextActions) {
