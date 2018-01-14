@@ -1,6 +1,6 @@
 /*!
  * factor-network.js v1.0.1
- * (c) 2018-01-06 Jade Gu
+ * (c) 2018-01-14 Jade Gu
  * Released under the MIT License.
  * @license
  */
@@ -781,13 +781,375 @@ var UCTNode = function () {
   return UCTNode;
 }();
 
+var MCNNS = function () {
+  function MCNNS(_ref) {
+    var network = _ref.network,
+        _ref$digitLength = _ref.digitLength,
+        digitLength = _ref$digitLength === undefined ? 5 : _ref$digitLength,
+        activationType = _ref.activationType;
+    classCallCheck(this, MCNNS);
+
+    this.board = new Board({
+      network: network,
+      digitLength: digitLength
+    });
+    this.activationType = activationType;
+    this.uct = new UCT$2(this.board);
+    this.collection = null;
+  }
+
+  createClass(MCNNS, [{
+    key: 'getModelList',
+    value: function getModelList() {
+      var _this = this;
+
+      var iterations = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+
+      var getModel = function getModel(_ref2) {
+        var board = _ref2.board;
+        return function (inputs) {
+          return computeNetwork(board.network, inputs, _this.activationType);
+        };
+      };
+      this.collection = this.uct.run(iterations);
+      return this.collection.map(getModel);
+    }
+  }, {
+    key: 'handleFeedback',
+    value: function handleFeedback(resultList) {
+      var _this2 = this;
+
+      resultList.forEach(function (result, index) {
+        var _collection$index = _this2.collection[index],
+            node = _collection$index.node,
+            score = _collection$index.score;
+
+        node.fixStatistic(result - score);
+      });
+    }
+  }]);
+  return MCNNS;
+}();
+
+var UCT$2 = function () {
+  function UCT(board) {
+    classCallCheck(this, UCT);
+
+    this.originalBoard = board;
+    this.board = null;
+    this.root = new UCTNode$1(null, this.originalBoard.getActions(), null);
+  }
+
+  createClass(UCT, [{
+    key: 'run',
+    value: function run(iterations) {
+      var _this3 = this;
+
+      var collection = Array.from({ length: Number(iterations) }).map(function () {
+        return _this3.runOnce();
+      });
+      return collection;
+    }
+  }, {
+    key: 'runOnce',
+    value: function runOnce() {
+      var node = this.root;
+      this.board = this.originalBoard.clone();
+      node = this.Selection(node);
+      node = this.Expanstion(node);
+      this.Simulation();
+      var score = !node.isRoot() ? node.parent.getScore() : 0;
+      this.Backpropagation(node, score);
+      return {
+        score: score,
+        node: node,
+        board: this.board
+      };
+    }
+  }, {
+    key: 'Selection',
+    value: function Selection(node) {
+      while (!node.hasUnexaminedAction() && node.children.length > 0) {
+        node = node.selectChild();
+        this.board.doAction(node.action);
+      }
+      return node;
+    }
+  }, {
+    key: 'Expanstion',
+    value: function Expanstion(node) {
+      if (node.hasUnexaminedAction()) {
+        var unexamineAction = node.getUnexamineActionRandomly();
+        this.board.doAction(unexamineAction);
+        node = node.addChild(unexamineAction, this.board.getActions());
+      }
+      return node;
+    }
+  }, {
+    key: 'Simulation',
+    value: function Simulation() {
+      var actions = this.board.getActions();
+      while (actions.length > 0) {
+        var randomAction = actions[Math.floor(Math.random() * actions.length)];
+        this.board.doAction(randomAction);
+        actions = this.board.getActions();
+      }
+    }
+  }, {
+    key: 'Backpropagation',
+    value: function Backpropagation(node, score) {
+      node.updateStatistic(score);
+    }
+  }]);
+  return UCT;
+}();
+
+var UCTNode$1 = function () {
+  function UCTNode(action, nextActions) {
+    var parent = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+    classCallCheck(this, UCTNode);
+
+    this.action = action;
+    this.nextActions = nextActions || [];
+    this.children = [];
+    this.wins = 0;
+    this.visits = 0;
+    this.parent = parent;
+  }
+
+  createClass(UCTNode, [{
+    key: 'isRoot',
+    value: function isRoot() {
+      return !this.parent;
+    }
+  }, {
+    key: 'hasUnexaminedAction',
+    value: function hasUnexaminedAction() {
+      return this.nextActions.length > 0;
+    }
+  }, {
+    key: 'getUnexamineActionRandomly',
+    value: function getUnexamineActionRandomly() {
+      var index = Math.floor(Math.random() * this.nextActions.length);
+      var action = this.nextActions.splice(index, 1)[0];
+      return action;
+    }
+  }, {
+    key: 'getScore',
+    value: function getScore() {
+      return this.visits > 0 ? this.wins / this.visits : 0;
+    }
+  }, {
+    key: 'getBestChild',
+    value: function getBestChild() {
+      var best = this.children[0];
+      for (var i = 1; i < this.children.length; i++) {
+        var child = this.children[i];
+        if (child.visits > best.visits) {
+          best = child;
+        } else if (child.visits === best.visits) {
+          best = child.wins > best.wins ? child : best;
+        }
+      }
+      return best;
+    }
+  }, {
+    key: 'getBestAction',
+    value: function getBestAction() {
+      return this.getBestChild().action;
+    }
+  }, {
+    key: 'getUCTValue',
+    value: function getUCTValue() {
+      var averageReward = this.getScore();
+      var parameter = this.parent.getScore();
+      var bias = parameter * Math.sqrt(2 * Math.log(this.parent.visits) / this.visits);
+      return averageReward + bias;
+    }
+  }, {
+    key: 'addChild',
+    value: function addChild(action, nextActions) {
+      var child = new UCTNode(action, nextActions, this);
+      this.children.push(child);
+      return child;
+    }
+  }, {
+    key: 'selectChild',
+    value: function selectChild() {
+      var selected = this.children[0];
+      for (var i = 1; i < this.children.length; i++) {
+        var child = this.children[i];
+        var childUctValue = child.getUCTValue();
+        var selectedUctValue = selected.getUCTValue();
+        if (childUctValue > selectedUctValue) {
+          selected = child;
+        } else if (childUctValue === selectedUctValue && Math.random() > 0.5) {
+          selected = child;
+        }
+      }
+      return selected;
+    }
+  }, {
+    key: 'updateStatistic',
+    value: function updateStatistic() {
+      var wins = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+
+      this.visits += 1;
+      this.wins += wins;
+      if (!this.isRoot()) {
+        this.parent.updateStatistic(wins);
+      }
+    }
+  }, {
+    key: 'fixStatistic',
+    value: function fixStatistic(wins) {
+      this.wins += wins;
+      if (!this.isRoot()) {
+        this.parent.updateStatistic(wins);
+      }
+    }
+  }]);
+  return UCTNode;
+}();
+
+var Board = function () {
+  function Board(_ref3) {
+    var network = _ref3.network,
+        _ref3$digitLength = _ref3.digitLength,
+        digitLength = _ref3$digitLength === undefined ? 5 : _ref3$digitLength,
+        _ref3$weightIndex = _ref3.weightIndex,
+        weightIndex = _ref3$weightIndex === undefined ? 0 : _ref3$weightIndex,
+        _ref3$digitIndex = _ref3.digitIndex,
+        digitIndex = _ref3$digitIndex === undefined ? 0 : _ref3$digitIndex;
+    classCallCheck(this, Board);
+
+    this.network = createNetwork(network);
+    this.weightList = getWeightList(this.network);
+    this.digitLength = digitLength;
+    this.weightIndex = weightIndex;
+    this.digitIndex = digitIndex;
+  }
+
+  createClass(Board, [{
+    key: 'clone',
+    value: function clone() {
+      var board = Object.assign(Object.create(Board.prototype), this);
+      board.network = cloneNetwork(this.network);
+      board.weightList = getWeightList(board.network);
+      return board;
+    }
+  }, {
+    key: 'getActions',
+    value: function getActions() {
+      if (this.digitIndex < this.digitLength) {
+        return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+      } else {
+        return [];
+      }
+    }
+  }, {
+    key: 'doAction',
+    value: function doAction(digit) {
+      this.weightList[this.weightIndex][this.digitIndex] = digit;
+      this.weightIndex += 1;
+      if (this.weightIndex === this.weightList.length) {
+        this.weightIndex = 0;
+        this.digitIndex += 1;
+      }
+    }
+  }]);
+  return Board;
+}();
+
+function createNetwork(options) {
+  var network = [];
+  var previousInputs = options[0];
+  for (var i = 1; i < options.length; i++) {
+    var currentLayer = [];
+    for (var j = 0; j < options[i]; j++) {
+      var currentNode = [];
+      for (var k = 0; k < previousInputs; k++) {
+        currentNode.push([]);
+      }
+      currentLayer.push(currentNode);
+    }
+    previousInputs = currentLayer.length;
+    network.push(currentLayer);
+  }
+  return network;
+}
+
+function computeNetwork(network, inputs) {
+  var activationType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'SIGMOID';
+
+  var currentInputs = inputs;
+  var networkResult = [inputs.concat()];
+  for (var i = 0; i < network.length; i++) {
+    var currentLayer = network[i];
+    var currentLayerResult = [];
+    for (var j = 0; j < currentLayer.length; j++) {
+      var currentNode = currentLayer[j];
+      var sum = 0;
+      for (var k = 0; k < currentNode.length; k++) {
+        var currentWeight = Number('0.' + currentNode[k].slice(0).join(''));
+        sum += currentInputs[k] * currentWeight;
+      }
+      var currentNodeResult = getActivation$1(activationType, i).output(sum);
+      currentLayerResult.push(currentNodeResult);
+    }
+    networkResult.push(currentLayerResult);
+    currentInputs = currentLayerResult;
+  }
+  return networkResult;
+}
+
+function getActivation$1(type, layerIndex) {
+  if (typeof type === 'string') {
+    return activation[type];
+  } else if (Array.isArray(type)) {
+    return activation[type[layerIndex]];
+  }
+}
+
+function walk$1(network, accessor) {
+  for (var i = 0; i < network.length; i++) {
+    var currentLayer = network[i];
+    for (var j = 0; j < currentLayer.length; j++) {
+      var currentNode = currentLayer[j];
+      for (var k = 0; k < currentNode.length; k++) {
+        var currentWeight = currentNode[k];
+        accessor({
+          weight: currentWeight,
+          node: currentNode,
+          layer: currentLayer,
+          network: network,
+          path: [i, j, k]
+        });
+      }
+    }
+  }
+}
+
+function getWeightList(network) {
+  var weightList = [];
+  walk$1(network, function (data) {
+    return weightList.push(data.weight);
+  });
+  return weightList;
+}
+
+function cloneNetwork(network) {
+  return JSON.parse(JSON.stringify(network));
+}
+
 var index = {
   network: network,
   createBackPropagation: createBackPropagation,
   createEvolution: createEvolution,
   MCM: MCM,
   MCTS: MCTS,
-  UCT: UCT
+  UCT: UCT,
+  MCNNS: MCNNS
 };
 
 return index;

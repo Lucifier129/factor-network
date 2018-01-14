@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import Evolution from './flappy-learning/Evolution'
 import EvolutionWithLabel from './flappy-learning/Evolution-with-label'
 import BackPropagation from './flappy-learning/BackPropagation'
+import MCNNS from './flappy-learning/MCNNS'
 import Master from './flappy-learning/Master'
 import HandwrittenDigit from './mnist/HandwrittenDigit'
 import MCM2048 from './2048/MCM'
@@ -13,6 +14,7 @@ const routes = {
   'Flappy-Bird-Of-Neuroevolution-Without-Labeled-Data': Evolution,
   'Flappy-Bird-Of-Neuroevolution-With-Labeled-Data': EvolutionWithLabel,
   'Flappy-Bird-Of-Back-Propagation': BackPropagation,
+  'Flappy-Bird-Of-Monte-Carlo-Neural-Network-Saearch': MCNNS,
   'Flappy-Bird-Of-Ten-Masters': Master,
   'MNIST-Handwritten-Digit-Of-Back-Propagation': HandwrittenDigit,
   'Game-2048-Of-Monte-Carlo-Method': MCM2048,
