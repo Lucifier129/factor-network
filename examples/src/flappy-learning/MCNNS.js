@@ -5,7 +5,7 @@ import createGame from './game'
 const mcnns = new MCNNS({
   network: [2, 2, 1],
   digitLength: 5,
-  activationType: 'TANH'
+  // activationType: 'RELU'
 })
 
 export default class Evolution extends React.Component {

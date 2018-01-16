@@ -5,12 +5,11 @@ const { network: $network } = FactorNetwork
 export default class MCNNS {
   constructor({ network, digitLength = 5, activationType }) {
     this.board = new NBoard({
-      network: $network.create(network)
+      network: $network.create(network),
     })
     this.activationType = activationType
     this.uct = new UCT(this.board)
     this.collection = null
-    this.epoch = 4
   }
   getModelList(iterations = 0) {
     let getModel = ({ board }) => inputs =>
@@ -23,26 +22,27 @@ export default class MCNNS {
       let { node, score } = this.collection[index]
       node.fixStatistic(result - score)
     })
-    this.epoch -= 1
-    if (!this.epoch) {
-      this.board.doAction(this.uct.root.getBestAction())
+    let actions = this.uct.root.getBestActions()
+    if (actions.length === 6) {
+      actions.forEach(action => this.board.doAction(action))
       this.board = new NBoard({
-        network: this.board.network
+        network: this.board.network,
       })
-      this.epoch = 4
       this.uct = new UCT(this.board)
     }
   }
 }
 
 const actions = {
-  0: weight => weight * 0.1,
-  1: weight => weight * 0.01,
-  2: weight => weight * 0.5,
-  3: weight => weight * 1.1,
-  4: weight => weight * 1.01,
-  5: weight => weight * 1.5,
-  6: weight => weight
+  // 0: weight => (1 + weight) / 2,
+  1: weight => weight / 2,
+  2: weight => weight * 2,
+  // 4: weight => weight,
+  5: weight => -weight,
+  // 6: weight => 0,
+  // 7: weight => 1,
+  8: weight => weight * 1.1,
+  9: weight => weight * 0.9,
 }
 class NBoard {
   constructor({ network }) {
@@ -65,7 +65,7 @@ class NBoard {
   doAction(action) {
     let count = 0
     $network.walk(this.network, ({ weight, path }) => {
-      if (count === this.index) {
+      if (count++ === this.index) {
         this.network[path[0]][path[1]][path[2]] = actions[action](weight)
       }
     })
@@ -161,6 +161,17 @@ class UCTNode {
       }
     }
     return best
+  }
+  getBestActions() {
+    let actions = []
+    let node = this
+    while (node) {
+      if (node.action) {
+        actions.push(node.action)
+      }
+      node = node.getBestChild()
+    }
+    return actions
   }
   getBestAction() {
     return this.getBestChild().action
