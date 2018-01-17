@@ -23,7 +23,7 @@ export default class MCNNS {
       node.fixStatistic(result - score)
     })
     let actions = this.uct.root.getBestActions()
-    if (actions.length === 6) {
+    if (this.uct.root.visits > 8000) {
       actions.forEach(action => this.board.doAction(action))
       this.board = new NBoard({
         network: this.board.network,
